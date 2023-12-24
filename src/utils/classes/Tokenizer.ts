@@ -1,23 +1,24 @@
 import { binaryOperators, unaryOperators } from "../constants/operators";
 
 export default class Tokenizer {
-  private str: string;
-  private ptr: number;
+  private str: string = "";
+  private ptr: number = 0;
+  private currentToken :string | null = null;
 
   constructor(str: string = "") {
-    this.str = str;
-    this.ptr = 0;
+    this.setStr(str);
   }
 
   public setStr(str: string) {
     this.str = str;
     this.ptr = 0;
+    this.currentToken = null;
   }
 
   private getCurrentChar() {
     return this.str.charAt(this.ptr);
   }
-
+  
   private skipWhiteSpaces() {
     while (this.getCurrentChar() === " ") {
       this.ptr++;
@@ -33,7 +34,7 @@ export default class Tokenizer {
     );
   }
 
-  public getNextToken() {
+  public advance(){
     let token = "";
 
     if (this.ptr >= this.str.length) {
@@ -54,6 +55,19 @@ export default class Tokenizer {
       !this.isOperator(this.getCurrentChar())
     );
 
-    return token;
+    this.currentToken = token;
+  }
+
+  public getCurrentPosition(){
+    return this.ptr;
+  }
+
+  public getCurrentToken(){
+    return this.currentToken;
+  }
+
+  public getNextToken() {
+    this.advance()
+    return this.getCurrentToken();
   }
 }
