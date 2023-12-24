@@ -38,6 +38,7 @@ export default class Tokenizer {
     let token = "";
 
     if (this.ptr >= this.str.length) {
+      this.currentToken = null;
       return null;
     }
 
