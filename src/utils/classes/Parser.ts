@@ -91,7 +91,7 @@ export default class Parser {
       this.tokenizer.getCurrentToken() === "*" ||
       this.tokenizer.getCurrentToken() === "/"
     ) {
-      root = BOST(this.tokenizer.getCurrentToken()!, root, this.factor());
+      root = BOST(this.tokenizer.getCurrentToken()!, root, this.power());
     }
 
     return root;
