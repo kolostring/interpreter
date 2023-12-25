@@ -6,14 +6,6 @@ import { OperandSyntaxTree } from "./OperandSyntaxTree";
 import Tokenizer from "./Tokenizer";
 import { UnaryOperatorSyntaxTree } from "./UnaryOperatorSyntaxTree";
 
-const UOST = (operator: string, child: AbstractSyntaxTree) => {
-  return new UnaryOperatorSyntaxTree(
-    operator,
-    unaryOperators[operator].operation,
-    child
-  );
-};
-
 const BOST = (
   operator: string,
   left: AbstractSyntaxTree,
@@ -38,27 +30,29 @@ export default class Parser {
     this.tokenizer.setStr(input);
   }
 
-  private factor(): AbstractSyntaxTree {
+  private eat(token :string){
+    if (this.tokenizer.getCurrentToken() !== token) {
+      throw new Error(
+        `"${token}" expected at col: ${this.tokenizer.getCurrentPosition()}`
+      );
+    }
     this.tokenizer.advance();
-    const currentToken = this.tokenizer.getCurrentToken();
+  }
+
+  private factor(): AbstractSyntaxTree {
+    const currentToken = this.tokenizer.getNextToken();
 
     if (currentToken === null) {
       throw new Error(
         `Factor expected at col: ${this.tokenizer.getCurrentPosition()}`
       );
     }
-    if (!isNaN(Number(currentToken))) {
-      const root = new OperandSyntaxTree(currentToken);
-      this.tokenizer.advance();
-      return root;
-    }
-    if (currentToken in mathConstants){
-      const root = new OperandSyntaxTree(mathConstants[currentToken]+"");
-      this.tokenizer.advance();
-      return root;
-    }
     if (currentToken === "+" || currentToken === "-") {
-      return UOST(currentToken, this.factor());
+      return new UnaryOperatorSyntaxTree(
+        currentToken,
+        unaryOperators[currentToken].operation,
+        this.factor()
+      );
     }
     if (currentToken in mathFunctions) {
       return new UnaryOperatorSyntaxTree(
@@ -67,14 +61,20 @@ export default class Parser {
         this.factor()
       );
     }
+
+    if (!isNaN(Number(currentToken))) {
+      const root = new OperandSyntaxTree(currentToken);
+      this.tokenizer.advance();
+      return root;
+    }
+    if (currentToken in mathConstants) {
+      const root = new OperandSyntaxTree(mathConstants[currentToken] + "");
+      this.tokenizer.advance();
+      return root;
+    }
     if (currentToken === "(") {
       const root = this.expression();
-      if (this.tokenizer.getCurrentToken() !== ")") {
-        throw new Error(
-          `Missing closure Parenthesis at col: ${this.tokenizer.getCurrentPosition()}`
-        );
-      }
-      this.tokenizer.advance();
+      this.eat(")");
       return root;
     }
 
@@ -86,7 +86,7 @@ export default class Parser {
   private power(): AbstractSyntaxTree {
     let root = this.factor();
 
-    while (this.tokenizer.getCurrentToken() === "^"){
+    while (this.tokenizer.getCurrentToken() === "^") {
       root = BOST("^", root, this.power());
     }
 
