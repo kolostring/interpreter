@@ -32,6 +32,6 @@ export class UnaryOperatorSyntaxTree extends AbstractSyntaxTree {
   }
 
   public postfix() {
-    return `${this.children[0]?.postfix()} ${this.token === "-" ? "-1" : "1" } *`
+    return `${this.children[0]?.postfix()} (${this.token})`
   }
 }
