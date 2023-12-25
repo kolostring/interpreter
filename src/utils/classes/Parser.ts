@@ -1,3 +1,4 @@
+import { mathConstants, mathFunctions } from "../constants/math";
 import { binaryOperators, unaryOperators } from "../constants/operators";
 import { AbstractSyntaxTree } from "./AbstractSyntaxTree";
 import { BinaryOperatorSyntaxTree } from "./BinaryOperatorSyntaxTree";
@@ -51,12 +52,20 @@ export default class Parser {
       this.tokenizer.advance();
       return root;
     }
-    if (
-      currentToken === "+" ||
-      currentToken === "-"
-    ) {
-      const root = UOST(currentToken, this.factor());
+    if (currentToken in mathConstants){
+      const root = new OperandSyntaxTree(mathConstants[currentToken]+"");
+      this.tokenizer.advance();
       return root;
+    }
+    if (currentToken === "+" || currentToken === "-") {
+      return UOST(currentToken, this.factor());
+    }
+    if (currentToken in mathFunctions) {
+      return new UnaryOperatorSyntaxTree(
+        currentToken,
+        mathFunctions[currentToken],
+        this.factor()
+      );
     }
     if (currentToken === "(") {
       const root = this.expression();

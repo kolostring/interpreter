@@ -35,14 +35,16 @@ describe("Parser", () => {
     expect(parser.expression().postfix()).toBe("12 34 + 56 *");
     parser.setInput("(12+34)*(56+78*(90+123))");
     expect(parser.expression().postfix()).toBe("12 34 + 56 78 90 123 + * + *");
+    parser.setInput("(12+(34*(56/(78))))");
+    expect(parser.expression().postfix()).toBe("12 34 56 78 / * +");
   });
 
   it("should parse unary operators", () => {
     parser.setInput("1--2");
-    expect(parser.expression().postfix()).toBe("1 2 -1 * -");
+    expect(parser.expression().postfix()).toBe("1 2 (-) -");
     parser.setInput("1---(---(2--3)-4)-(-5)");
     expect(parser.expression().postfix()).toBe(
-      "1 2 3 -1 * - -1 * -1 * -1 * 4 - -1 * -1 * - 5 -1 * -"
+      "1 2 3 (-) - (-) (-) (-) 4 - (-) (-) - 5 (-) -"
     );
   });
 
@@ -51,6 +53,17 @@ describe("Parser", () => {
     expect(parser.expression().postfix()).toBe("1 2 3 ^ ^");
     parser.setInput("1^(2*3)^(4*5)");
     expect(parser.expression().postfix()).toBe("1 2 3 * 4 5 * ^ ^");
+    parser.setInput("1^(2*3^2^2^2)^(4*5)");
+    expect(parser.expression().postfix()).toBe("1 2 3 2 2 2 ^ ^ ^ * 4 5 * ^ ^");
+  })
+
+  it("should parse math functions calls", () => {
+    parser.setInput("sin 123");
+    expect(parser.expression().postfix()).toBe("123 (sin)");
+    parser.setInput("cos(123*34)");
+    expect(parser.expression().postfix()).toBe("123 34 * (cos)");
+    parser.setInput("tan(123*45*cos-2^2)");
+    expect(parser.expression().postfix()).toBe("123 45 * 2 (-) (cos) 2 ^ * (tan)");
   })
 
   it("should not allow to have missing operands", () => {
