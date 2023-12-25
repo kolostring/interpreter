@@ -39,25 +39,26 @@ export default class Parser {
 
   private factor(): AbstractSyntaxTree {
     this.tokenizer.advance();
+    const currentToken = this.tokenizer.getCurrentToken();
 
-    if (this.tokenizer.getCurrentToken() === null) {
+    if (currentToken === null) {
       throw new Error(
         `Factor expected at col: ${this.tokenizer.getCurrentPosition()}`
       );
     }
-    if (!isNaN(Number(this.tokenizer.getCurrentToken()))) {
-      const root = new OperandSyntaxTree(this.tokenizer.getCurrentToken()!);
+    if (!isNaN(Number(currentToken))) {
+      const root = new OperandSyntaxTree(currentToken);
       this.tokenizer.advance();
       return root;
     }
     if (
-      this.tokenizer.getCurrentToken() === "+" ||
-      this.tokenizer.getCurrentToken() === "-"
+      currentToken === "+" ||
+      currentToken === "-"
     ) {
-      const root = UOST(this.tokenizer.getCurrentToken()!, this.factor());
+      const root = UOST(currentToken, this.factor());
       return root;
     }
-    if (this.tokenizer.getCurrentToken() === "(") {
+    if (currentToken === "(") {
       const root = this.expression();
       if (this.tokenizer.getCurrentToken() !== ")") {
         throw new Error(
@@ -69,12 +70,22 @@ export default class Parser {
     }
 
     throw new Error(
-      `Invalid token "${this.tokenizer.getCurrentToken()}" at col: ${this.tokenizer.getCurrentPosition()}`
+      `Invalid token "${currentToken}" at col: ${this.tokenizer.getCurrentPosition()}`
     );
   }
 
-  private terminal(): AbstractSyntaxTree {
+  private power(): AbstractSyntaxTree {
     let root = this.factor();
+
+    while (this.tokenizer.getCurrentToken() === "^"){
+      root = BOST("^", root, this.power());
+    }
+
+    return root;
+  }
+
+  private terminal(): AbstractSyntaxTree {
+    let root = this.power();
 
     while (
       this.tokenizer.getCurrentToken() === "*" ||

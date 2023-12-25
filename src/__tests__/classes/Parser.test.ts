@@ -46,6 +46,13 @@ describe("Parser", () => {
     );
   });
 
+  it("should parse power operators with right associativity", () => {
+    parser.setInput("1^2^3");
+    expect(parser.expression().postfix()).toBe("1 2 3 ^ ^");
+    parser.setInput("1^(2*3)^(4*5)");
+    expect(parser.expression().postfix()).toBe("1 2 3 * 4 5 * ^ ^");
+  })
+
   it("should not allow to have missing operands", () => {
     ["1-", "1*2**3"].forEach((input) => {
       parser.setInput(input);
