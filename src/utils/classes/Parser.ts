@@ -1,24 +1,9 @@
 import { mathConstants, mathFunctions } from "../constants/math";
-import { binaryOperators, unaryOperators } from "../constants/operators";
 import { AbstractSyntaxTree } from "./AST/AbstractSyntaxTree";
-import { BinaryOperatorSyntaxTree } from "./AST/BinaryOperatorSyntaxTree";
+import { BinaryArithmeticOperatorSyntaxTree } from "./AST/BinaryArithmeticOperatorSyntaxTree";
 import { OperandSyntaxTree } from "./AST/OperandSyntaxTree";
 import { UnaryOperatorSyntaxTree } from "./AST/UnaryOperatorSyntaxTree";
 import Tokenizer from "./Tokenizer";
-
-
-const BOST = (
-  operator: string,
-  left: AbstractSyntaxTree,
-  right: AbstractSyntaxTree
-) => {
-  return new BinaryOperatorSyntaxTree(
-    operator,
-    binaryOperators[operator].operation,
-    left,
-    right
-  );
-};
 
 export default class Parser {
   private tokenizer: Tokenizer;
@@ -31,7 +16,7 @@ export default class Parser {
     this.tokenizer.setStr(input);
   }
 
-  private eat(token :string){
+  private eat(token: string) {
     if (this.tokenizer.getCurrentToken() !== token) {
       throw new Error(
         `"${token}" expected at col: ${this.tokenizer.getCurrentPosition()}`
@@ -49,18 +34,10 @@ export default class Parser {
       );
     }
     if (currentToken === "+" || currentToken === "-") {
-      return new UnaryOperatorSyntaxTree(
-        currentToken,
-        unaryOperators[currentToken].operation,
-        this.basePower()
-      );
+      return new UnaryOperatorSyntaxTree(currentToken, this.basePower());
     }
     if (currentToken in mathFunctions) {
-      return new UnaryOperatorSyntaxTree(
-        currentToken,
-        mathFunctions[currentToken],
-        this.basePower()
-      );
+      return new UnaryOperatorSyntaxTree(currentToken, this.basePower());
     }
 
     if (!isNaN(Number(currentToken))) {
@@ -88,7 +65,7 @@ export default class Parser {
     let root = this.basePower();
 
     while (this.tokenizer.getCurrentToken() === "^") {
-      root = BOST("^", root, this.factor());
+      root = new BinaryArithmeticOperatorSyntaxTree("^", root, this.factor());
     }
 
     return root;
@@ -101,7 +78,11 @@ export default class Parser {
       this.tokenizer.getCurrentToken() === "*" ||
       this.tokenizer.getCurrentToken() === "/"
     ) {
-      root = BOST(this.tokenizer.getCurrentToken()!, root, this.factor());
+      root = new BinaryArithmeticOperatorSyntaxTree(
+        this.tokenizer.getCurrentToken()!,
+        root,
+        this.factor()
+      );
     }
 
     return root;
@@ -114,7 +95,11 @@ export default class Parser {
       this.tokenizer.getCurrentToken() === "+" ||
       this.tokenizer.getCurrentToken() === "-"
     ) {
-      root = BOST(this.tokenizer.getCurrentToken()!, root, this.term());
+      root = new BinaryArithmeticOperatorSyntaxTree(
+        this.tokenizer.getCurrentToken()!,
+        root,
+        this.term()
+      );
     }
 
     return root;

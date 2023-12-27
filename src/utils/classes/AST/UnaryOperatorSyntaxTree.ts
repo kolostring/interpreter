@@ -1,15 +1,12 @@
+import {
+  unaryArithmeticOperators,
+  unaryLogicalOperators,
+} from "../../constants/operators";
 import { AbstractSyntaxTree } from "./AbstractSyntaxTree";
 
 export class UnaryOperatorSyntaxTree extends AbstractSyntaxTree {
-  private evaluationCallback: (a: number) => number;
-
-  constructor(
-    token: string,
-    evaluationCallback: (a: number) => number,
-    child: AbstractSyntaxTree | null = null
-  ) {
+  constructor(token: string, child: AbstractSyntaxTree | null = null) {
     super(token, [child]);
-    this.evaluationCallback = evaluationCallback;
   }
 
   public insertChild(child: AbstractSyntaxTree): void {
@@ -28,10 +25,32 @@ export class UnaryOperatorSyntaxTree extends AbstractSyntaxTree {
         `Unary Operator "${this.token}" cannot perform it's operation without an operand`
       );
     }
-    return this.evaluationCallback(this.children[0].evaluate());
+
+    const childEval = this.children[0].evaluate();
+
+    if (this.token in unaryArithmeticOperators) {
+      if (typeof childEval === "number") {
+        return unaryArithmeticOperators[this.token].operation(childEval);
+      } else {
+        throw new Error(
+          `Operator "${this.token}" performs it's operation on numbers only`
+        );
+      }
+    }
+    if (this.token in unaryLogicalOperators) {
+      if (typeof childEval === "boolean") {
+        return unaryLogicalOperators[this.token].operation(childEval);
+      } else {
+        throw new Error(
+          `Operator "${this.token}" performs it's operation on booleans only`
+        );
+      }
+    }
+
+    throw new Error(`Invalid Operator "${this.token}`);
   }
 
   public postfix() {
-    return `${this.children[0]?.postfix()} (${this.token})`
+    return `${this.children[0]?.postfix()} (${this.token})`;
   }
 }

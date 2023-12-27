@@ -16,6 +16,6 @@ export abstract class AbstractSyntaxTree {
   }
 
   public abstract insertChild(child: AbstractSyntaxTree): void;
-  public abstract evaluate(): number;
+  public abstract evaluate(): number | boolean;
   public abstract postfix(): string;
 }

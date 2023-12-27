@@ -1,9 +1,16 @@
-import { binaryOperators, unaryOperators } from "../constants/operators";
+import {
+  binaryArithmeticOperators,
+  binaryLogicalOperators,
+  equalityOperators,
+  relationalOperators,
+  unaryArithmeticOperators,
+  unaryLogicalOperators,
+} from "../constants/operators";
 
 export default class Tokenizer {
   private str: string = "";
   private ptr: number = 0;
-  private currentToken :string | null = null;
+  private currentToken: string | null = null;
 
   constructor(str: string = "") {
     this.setStr(str);
@@ -18,7 +25,7 @@ export default class Tokenizer {
   private getCurrentChar() {
     return this.str.charAt(this.ptr);
   }
-  
+
   private skipWhiteSpaces() {
     while (this.getCurrentChar() === " ") {
       this.ptr++;
@@ -27,14 +34,18 @@ export default class Tokenizer {
 
   private isOperator(token: string) {
     return (
-      token in binaryOperators ||
-      token in unaryOperators ||
+      token in binaryArithmeticOperators ||
+      token in binaryLogicalOperators ||
+      token in relationalOperators ||
+      token in equalityOperators ||
+      token in unaryArithmeticOperators ||
+      token in unaryLogicalOperators ||
       token === "(" ||
       token === ")"
     );
   }
 
-  public advance(){
+  public advance() {
     let token = "";
 
     if (this.ptr >= this.str.length) {
@@ -59,16 +70,16 @@ export default class Tokenizer {
     this.currentToken = token;
   }
 
-  public getCurrentPosition(){
+  public getCurrentPosition() {
     return this.ptr;
   }
 
-  public getCurrentToken(){
+  public getCurrentToken() {
     return this.currentToken;
   }
 
   public getNextToken() {
-    this.advance()
+    this.advance();
     return this.getCurrentToken();
   }
 }

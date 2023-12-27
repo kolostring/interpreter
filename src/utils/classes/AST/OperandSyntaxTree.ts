@@ -1,6 +1,5 @@
 import { AbstractSyntaxTree } from "./AbstractSyntaxTree";
 
-
 export class OperandSyntaxTree extends AbstractSyntaxTree {
   constructor(token: string) {
     super(token, []);
@@ -12,9 +11,9 @@ export class OperandSyntaxTree extends AbstractSyntaxTree {
     );
   }
 
-	public evaluate() {
-		return Number(this.token)
-	}
+  public evaluate() {
+    return Number(this.token);
+  }
 
   public postfix() {
     return this.token;

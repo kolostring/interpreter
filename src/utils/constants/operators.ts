@@ -1,12 +1,30 @@
-type BinaryOperatorInfo = {
-  operation: ((a: number, b: number) => number);
+type BinaryArithmeticOperatorInfo = {
+  operation: (a: number, b: number) => number;
 };
 
-type UnaryOperatorInfo = {
-  operation: ((a: number) => number);
+type BinaryLogicalOperatorInfo = {
+  operation: (a: boolean, b: boolean) => boolean;
 };
 
-export const binaryOperators: { [key: string]: BinaryOperatorInfo } = {
+type RelationalOperator = {
+  operation: (a: number, b: number) => boolean;
+}
+
+type EqualityOperator = {
+  operation: (a: string, b: string) => boolean;
+}
+
+type UnaryArithmeticOperatorInfo = {
+  operation: (a: number) => number;
+};
+
+type UnaryLogicalOperatorInfo = {
+  operation: (a: boolean) => boolean;
+};
+
+export const binaryArithmeticOperators: {
+  [key: string]: BinaryArithmeticOperatorInfo;
+} = {
   "+": {
     operation: (a, b) => a + b,
   },
@@ -24,11 +42,56 @@ export const binaryOperators: { [key: string]: BinaryOperatorInfo } = {
   },
 };
 
-export const unaryOperators: { [key: string]: UnaryOperatorInfo } = {
+export const relationalOperators : {[key: string]: RelationalOperator} = {
+  "<": {
+    operation: (a, b) => a < b,
+  },
+  "<=": {
+    operation: (a, b) => a <= b,
+  },
+  ">": {
+    operation: (a, b) => a > b,
+  },
+  ">=": {
+    operation: (a, b) => a >= b,
+  },
+}
+
+export const equalityOperators : {[key :string]: EqualityOperator} = {
+  "==": {
+    operation: (a, b) => a === b,
+  },
+  "!=": {
+    operation: (a, b) => a !== b,
+  },
+}
+
+export const binaryLogicalOperators: {
+  [key: string]: BinaryLogicalOperatorInfo;
+} = {
+  "&&": {
+    operation: (a, b) => a && b,
+  },
+  "||": {
+    operation: (a, b) => a || b,
+  }
+};
+
+export const unaryArithmeticOperators: {
+  [key: string]: UnaryArithmeticOperatorInfo;
+} = {
   "+": {
     operation: (a) => a,
   },
   "-": {
     operation: (a) => a * -1,
+  },
+};
+
+export const unaryLogicalOperators: {
+  [key: string]: UnaryLogicalOperatorInfo;
+} = {
+  "!": {
+    operation: (a) => !a,
   },
 };
