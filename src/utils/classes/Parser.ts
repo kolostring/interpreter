@@ -39,26 +39,26 @@ export default class Parser {
     this.tokenizer.advance();
   }
 
-  private factor(): AbstractSyntaxTree {
+  private power(): AbstractSyntaxTree {
     const currentToken = this.tokenizer.getNextToken();
 
     if (currentToken === null) {
       throw new Error(
-        `Factor expected at col: ${this.tokenizer.getCurrentPosition()}`
+        `Expression expected at col: ${this.tokenizer.getCurrentPosition()}`
       );
     }
     if (currentToken === "+" || currentToken === "-") {
       return new UnaryOperatorSyntaxTree(
         currentToken,
         unaryOperators[currentToken].operation,
-        this.factor()
+        this.power()
       );
     }
     if (currentToken in mathFunctions) {
       return new UnaryOperatorSyntaxTree(
         currentToken,
         mathFunctions[currentToken],
-        this.factor()
+        this.power()
       );
     }
 
@@ -83,37 +83,37 @@ export default class Parser {
     );
   }
 
-  private power(): AbstractSyntaxTree {
-    let root = this.factor();
+  private factor(): AbstractSyntaxTree {
+    let root = this.power();
 
     while (this.tokenizer.getCurrentToken() === "^") {
-      root = BOST("^", root, this.power());
+      root = BOST("^", root, this.factor());
     }
 
     return root;
   }
 
-  private terminal(): AbstractSyntaxTree {
-    let root = this.power();
+  private term(): AbstractSyntaxTree {
+    let root = this.factor();
 
     while (
       this.tokenizer.getCurrentToken() === "*" ||
       this.tokenizer.getCurrentToken() === "/"
     ) {
-      root = BOST(this.tokenizer.getCurrentToken()!, root, this.power());
+      root = BOST(this.tokenizer.getCurrentToken()!, root, this.factor());
     }
 
     return root;
   }
 
   public expression(): AbstractSyntaxTree {
-    let root = this.terminal();
+    let root = this.term();
 
     while (
       this.tokenizer.getCurrentToken() === "+" ||
       this.tokenizer.getCurrentToken() === "-"
     ) {
-      root = BOST(this.tokenizer.getCurrentToken()!, root, this.terminal());
+      root = BOST(this.tokenizer.getCurrentToken()!, root, this.term());
     }
 
     return root;
