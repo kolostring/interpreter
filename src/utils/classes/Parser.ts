@@ -1,10 +1,11 @@
 import { mathConstants, mathFunctions } from "../constants/math";
 import { binaryOperators, unaryOperators } from "../constants/operators";
-import { AbstractSyntaxTree } from "./AbstractSyntaxTree";
-import { BinaryOperatorSyntaxTree } from "./BinaryOperatorSyntaxTree";
-import { OperandSyntaxTree } from "./OperandSyntaxTree";
+import { AbstractSyntaxTree } from "./AST/AbstractSyntaxTree";
+import { BinaryOperatorSyntaxTree } from "./AST/BinaryOperatorSyntaxTree";
+import { OperandSyntaxTree } from "./AST/OperandSyntaxTree";
+import { UnaryOperatorSyntaxTree } from "./AST/UnaryOperatorSyntaxTree";
 import Tokenizer from "./Tokenizer";
-import { UnaryOperatorSyntaxTree } from "./UnaryOperatorSyntaxTree";
+
 
 const BOST = (
   operator: string,
