@@ -1,7 +1,11 @@
 import { mathConstants, mathFunctions } from "../constants/math";
+import { equalityOperators, relationalOperators } from "../constants/operators";
 import { AbstractSyntaxTree } from "./AST/AbstractSyntaxTree";
 import { BinaryArithmeticOperatorSyntaxTree } from "./AST/BinaryArithmeticOperatorSyntaxTree";
+import { BinaryLogicalOperatorSyntaxTree } from "./AST/BinaryLogicalOperatorSyntaxTree";
+import { EqualityOperatorSyntaxTree } from "./AST/EqualityOperatorSyntaxTree";
 import { OperandSyntaxTree } from "./AST/OperandSyntaxTree";
+import { RelationalOperatorSyntaxTree } from "./AST/RelationalOperatorSyntaxTree";
 import { UnaryOperatorSyntaxTree } from "./AST/UnaryOperatorSyntaxTree";
 import Tokenizer from "./Tokenizer";
 
@@ -51,7 +55,7 @@ export default class Parser {
       return root;
     }
     if (currentToken === "(") {
-      const root = this.arithmeitcExpression();
+      const root = this.expression();
       this.eat(")");
       return root;
     }
@@ -103,5 +107,51 @@ export default class Parser {
     }
 
     return root;
+  }
+
+  private relation() :AbstractSyntaxTree {
+    let root = this.arithmeitcExpression();
+
+    const currToken = this.tokenizer.getCurrentToken();
+    if (currToken!=null && currToken in relationalOperators){
+      root = new RelationalOperatorSyntaxTree(currToken, root, this.arithmeitcExpression());
+    }
+
+    return root;
+  }
+
+  private equality() :AbstractSyntaxTree {
+    let root = this.relation();
+
+    const currToken = this.tokenizer.getCurrentToken();
+    if (currToken!=null && currToken in equalityOperators){
+      root = new EqualityOperatorSyntaxTree(currToken, root, this.relation());
+    }
+
+    return root;
+  }
+
+  private conjunction() :AbstractSyntaxTree {
+    let root = this.equality();
+
+    while(this.tokenizer.getCurrentToken() === "&&"){
+      root = new BinaryLogicalOperatorSyntaxTree("&&", root, this.equality());
+    }
+
+    return root;
+  }
+
+  private disjunction() :AbstractSyntaxTree {
+    let root = this.conjunction();
+
+    while(this.tokenizer.getCurrentToken() === "||"){
+      root = new BinaryLogicalOperatorSyntaxTree("||", root, this.conjunction());
+    }
+
+    return root;
+  }
+
+  public expression() :AbstractSyntaxTree {
+    return this.disjunction();
   }
 }
