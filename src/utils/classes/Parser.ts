@@ -40,7 +40,7 @@ export default class Parser {
     this.tokenizer.advance();
   }
 
-  private power(): AbstractSyntaxTree {
+  private basePower(): AbstractSyntaxTree {
     const currentToken = this.tokenizer.getNextToken();
 
     if (currentToken === null) {
@@ -52,14 +52,14 @@ export default class Parser {
       return new UnaryOperatorSyntaxTree(
         currentToken,
         unaryOperators[currentToken].operation,
-        this.power()
+        this.basePower()
       );
     }
     if (currentToken in mathFunctions) {
       return new UnaryOperatorSyntaxTree(
         currentToken,
         mathFunctions[currentToken],
-        this.power()
+        this.basePower()
       );
     }
 
@@ -74,7 +74,7 @@ export default class Parser {
       return root;
     }
     if (currentToken === "(") {
-      const root = this.expression();
+      const root = this.arithmeitcExpression();
       this.eat(")");
       return root;
     }
@@ -85,7 +85,7 @@ export default class Parser {
   }
 
   private factor(): AbstractSyntaxTree {
-    let root = this.power();
+    let root = this.basePower();
 
     while (this.tokenizer.getCurrentToken() === "^") {
       root = BOST("^", root, this.factor());
@@ -107,7 +107,7 @@ export default class Parser {
     return root;
   }
 
-  public expression(): AbstractSyntaxTree {
+  public arithmeitcExpression(): AbstractSyntaxTree {
     let root = this.term();
 
     while (
