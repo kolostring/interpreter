@@ -41,20 +41,42 @@ export default class Tokenizer {
       token in unaryArithmeticOperators ||
       token in unaryLogicalOperators ||
       token === "(" ||
-      token === ")"
+      token === ")" ||
+      token === "=" ||
+      token === "&" ||
+      token === "|"
     );
   }
 
-  public advance() {
+  private getOperator() {
+    let token = "";
+
+    do {
+      token += this.getCurrentChar();
+      this.ptr++;
+    } while (
+      this.ptr < this.str.length &&
+      this.isOperator(token + this.getCurrentChar())
+    );
+
+    return token;
+  }
+
+  public advance(): void {
     let token = "";
 
     if (this.ptr >= this.str.length) {
       this.currentToken = null;
-      return null;
+      return;
     }
 
     if (this.getCurrentChar() === " ") {
       this.skipWhiteSpaces();
+    }
+
+    if (this.isOperator(this.getCurrentChar())) {
+      this.currentToken = this.getOperator();
+      return;
     }
 
     do {
@@ -63,7 +85,6 @@ export default class Tokenizer {
     } while (
       this.ptr < this.str.length &&
       this.getCurrentChar() !== " " &&
-      !this.isOperator(token) &&
       !this.isOperator(this.getCurrentChar())
     );
 
