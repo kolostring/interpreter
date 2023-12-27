@@ -2,7 +2,7 @@ import { equalityOperators } from "../../constants/operators";
 import { AbstractSyntaxTree } from "./AbstractSyntaxTree";
 import { BinaryOperatorSyntaxTree } from "./BinaryOperatorSyntaxTree";
 
-export class RelationalOperatorSyntaxTree extends BinaryOperatorSyntaxTree {
+export class EqualityOperatorSyntaxTree extends BinaryOperatorSyntaxTree {
   constructor(
     token: string,
     left: AbstractSyntaxTree | null = null,
