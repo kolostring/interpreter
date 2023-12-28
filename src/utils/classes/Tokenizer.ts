@@ -44,7 +44,8 @@ export default class Tokenizer {
       token === ")" ||
       token === "=" ||
       token === "&" ||
-      token === "|"
+      token === "|" ||
+      token === ";"
     );
   }
 

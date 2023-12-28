@@ -1,5 +1,10 @@
 import { mathConstants, mathFunctions } from "../constants/math";
-import { equalityOperators, relationalOperators } from "../constants/operators";
+import {
+  binaryLogicalOperators,
+  equalityOperators,
+  relationalOperators,
+  unaryLogicalOperators,
+} from "../constants/operators";
 import { AbstractSyntaxTree } from "./AST/AbstractSyntaxTree";
 import { BinaryArithmeticOperatorSyntaxTree } from "./AST/BinaryArithmeticOperatorSyntaxTree";
 import { BinaryLogicalOperatorSyntaxTree } from "./AST/BinaryLogicalOperatorSyntaxTree";
@@ -43,7 +48,6 @@ export default class Parser {
     if (currentToken in mathFunctions) {
       return new UnaryOperatorSyntaxTree(currentToken, this.basePower());
     }
-
     if (!isNaN(Number(currentToken))) {
       const root = new OperandSyntaxTree(currentToken);
       this.tokenizer.advance();
@@ -92,7 +96,7 @@ export default class Parser {
     return root;
   }
 
-  public arithmeitcExpression(): AbstractSyntaxTree {
+  private arithmeitcExpression(): AbstractSyntaxTree {
     let root = this.term();
 
     while (
@@ -109,49 +113,73 @@ export default class Parser {
     return root;
   }
 
-  private relation() :AbstractSyntaxTree {
+  private relation(): AbstractSyntaxTree {
     let root = this.arithmeitcExpression();
 
     const currToken = this.tokenizer.getCurrentToken();
-    if (currToken!=null && currToken in relationalOperators){
-      root = new RelationalOperatorSyntaxTree(currToken, root, this.arithmeitcExpression());
+    if (currToken != null && currToken in relationalOperators) {
+      const rightExp = this.arithmeitcExpression();
+      if (
+        rightExp.getToken() in
+        {
+          ...relationalOperators,
+          ...binaryLogicalOperators,
+          ...equalityOperators,
+          ...unaryLogicalOperators,
+        }
+      ) {
+        throw new Error(
+          `Operator ${currToken} can't perform operation on booleans`
+        );
+      }
+      root = new RelationalOperatorSyntaxTree(currToken, root, rightExp);
     }
 
     return root;
   }
 
-  private equality() :AbstractSyntaxTree {
+  private equality(): AbstractSyntaxTree {
     let root = this.relation();
 
     const currToken = this.tokenizer.getCurrentToken();
-    if (currToken!=null && currToken in equalityOperators){
+    if (currToken != null && currToken in equalityOperators) {
       root = new EqualityOperatorSyntaxTree(currToken, root, this.relation());
     }
 
     return root;
   }
 
-  private conjunction() :AbstractSyntaxTree {
+  private conjunction(): AbstractSyntaxTree {
     let root = this.equality();
 
-    while(this.tokenizer.getCurrentToken() === "&&"){
+    while (this.tokenizer.getCurrentToken() === "&&") {
       root = new BinaryLogicalOperatorSyntaxTree("&&", root, this.equality());
     }
 
     return root;
   }
 
-  private disjunction() :AbstractSyntaxTree {
+  private disjunction(): AbstractSyntaxTree {
     let root = this.conjunction();
 
-    while(this.tokenizer.getCurrentToken() === "||"){
-      root = new BinaryLogicalOperatorSyntaxTree("||", root, this.conjunction());
+    while (this.tokenizer.getCurrentToken() === "||") {
+      root = new BinaryLogicalOperatorSyntaxTree(
+        "||",
+        root,
+        this.conjunction()
+      );
     }
 
     return root;
   }
 
-  public expression() :AbstractSyntaxTree {
+  private expression(): AbstractSyntaxTree {
     return this.disjunction();
+  }
+
+  public sentence(): AbstractSyntaxTree {
+    const root = this.expression();
+    this.eat(";");
+    return root;
   }
 }
