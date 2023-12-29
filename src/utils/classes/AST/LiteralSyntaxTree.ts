@@ -1,6 +1,6 @@
 import { AbstractSyntaxTree } from "./AbstractSyntaxTree";
 
-export class OperandSyntaxTree extends AbstractSyntaxTree {
+export class LiteralSyntaxTree extends AbstractSyntaxTree {
   constructor(token: string) {
     super(token, []);
   }
@@ -12,6 +12,9 @@ export class OperandSyntaxTree extends AbstractSyntaxTree {
   }
 
   public evaluate() {
+    if(this.token === "true" || this.token === "false"){
+      return Boolean(this.token);
+    }
     return Number(this.token);
   }
 

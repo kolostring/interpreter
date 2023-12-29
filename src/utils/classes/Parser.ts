@@ -10,7 +10,7 @@ import { AbstractSyntaxTree } from "./AST/AbstractSyntaxTree";
 import { BinaryArithmeticOperatorSyntaxTree } from "./AST/ArithmeticSyntaxTree/BinaryArithmeticOperatorSyntaxTree";
 import { BinaryLogicalOperatorSyntaxTree } from "./AST/LogicalSyntaxTree/BinaryLogicalOperatorSyntaxTree";
 import { EqualityOperatorSyntaxTree } from "./AST/LogicalSyntaxTree/EqualityOperatorSyntaxTree";
-import { OperandSyntaxTree } from "./AST/OperandSyntaxTree";
+import { LiteralSyntaxTree } from "./AST/LiteralSyntaxTree";
 import { RelationalOperatorSyntaxTree } from "./AST/LogicalSyntaxTree/RelationalOperatorSyntaxTree";
 import Tokenizer from "./Tokenizer";
 import { UnaryArithmeticOperatorSyntaxTree } from "./AST/ArithmeticSyntaxTree/UnaryArithmeticSyntaxTree";
@@ -53,13 +53,17 @@ export default class Parser {
     if (currentToken in unaryLogicalOperators) {
       return new UnaryLogicalOperatorSyntaxTree(currentToken, this.basePower());
     }
-    if (!isNaN(Number(currentToken))) {
-      const root = new OperandSyntaxTree(currentToken);
+    if (
+      !isNaN(Number(currentToken)) ||
+      currentToken === "true" ||
+      currentToken === "false"
+    ) {
+      const root = new LiteralSyntaxTree(currentToken);
       this.tokenizer.advance();
       return root;
     }
     if (currentToken in mathConstants) {
-      const root = new OperandSyntaxTree(mathConstants[currentToken] + "");
+      const root = new LiteralSyntaxTree(mathConstants[currentToken] + "");
       this.tokenizer.advance();
       return root;
     }
