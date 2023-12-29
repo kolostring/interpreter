@@ -39,7 +39,7 @@ describe("Parser", () => {
     expect(parser.sentence().postfix()).toBe("12 34 56 78 / * +");
   });
 
-  it("should parse unary operators", () => {
+  it("should parse unary arithmetic operators", () => {
     parser.setInput("1--2;");
     expect(parser.sentence().postfix()).toBe("1 2 (-) -");
     parser.setInput("1---(---(2--3)-4)-(-5);");
@@ -55,17 +55,6 @@ describe("Parser", () => {
     expect(parser.sentence().postfix()).toBe("1 2 3 * 4 5 * ^ ^");
     parser.setInput("1^(2*3^2^2^2)^(4*5);");
     expect(parser.sentence().postfix()).toBe("1 2 3 2 2 2 ^ ^ ^ * 4 5 * ^ ^");
-  });
-
-  it("should parse math functions calls", () => {
-    parser.setInput("sin 123;");
-    expect(parser.sentence().postfix()).toBe("123 (sin)");
-    parser.setInput("cos(123*34);");
-    expect(parser.sentence().postfix()).toBe("123 34 * (cos)");
-    parser.setInput("tan(123*45*cos-2^2);");
-    expect(parser.sentence().postfix()).toBe(
-      "123 45 * 2 (-) (cos) 2 ^ * (tan)"
-    );
   });
 
   it("should parse Relational Operations", () => {
@@ -88,6 +77,11 @@ describe("Parser", () => {
     parser.setInput("12<3 && (4 > 5 || 6) || 7 != 8;");
     expect(parser.sentence().postfix()).toBe("12 3 < 4 5 > 6 || && 7 8 != ||");
   });
+
+  it("should parse Unary Logical Operator", () => {
+    parser.setInput("!(12 == 3) && !(!(4>5) || (6<=7));");
+    expect(parser.sentence().postfix()).toBe("12 3 == (!) 4 5 > (!) 6 7 <= || (!) &&");
+  })
 
   it("should not allow to have missing operands", () => {
     parser.setInput("1-;");
