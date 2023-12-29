@@ -11,8 +11,8 @@ import { BinaryLogicalOperatorSyntaxTree } from "./AST/LogicalSyntaxTree/BinaryL
 import { EqualityOperatorSyntaxTree } from "./AST/LogicalSyntaxTree/EqualityOperatorSyntaxTree";
 import { OperandSyntaxTree } from "./AST/OperandSyntaxTree";
 import { RelationalOperatorSyntaxTree } from "./AST/LogicalSyntaxTree/RelationalOperatorSyntaxTree";
-import { UnaryOperatorSyntaxTree } from "./AST/UnaryOperatorSyntaxTree";
 import Tokenizer from "./Tokenizer";
+import { UnaryArithmeticOperatorSyntaxTree } from "./AST/ArithmeticSyntaxTree/UnaryArithmeticSyntaxTree";
 
 export default class Parser {
   private tokenizer: Tokenizer;
@@ -43,10 +43,10 @@ export default class Parser {
       );
     }
     if (currentToken === "+" || currentToken === "-") {
-      return new UnaryOperatorSyntaxTree(currentToken, this.basePower());
+      return new UnaryArithmeticOperatorSyntaxTree(currentToken, this.basePower());
     }
     if (currentToken in mathFunctions) {
-      return new UnaryOperatorSyntaxTree(currentToken, this.basePower());
+      return new UnaryArithmeticOperatorSyntaxTree(currentToken, this.basePower());
     }
     if (!isNaN(Number(currentToken))) {
       const root = new OperandSyntaxTree(currentToken);
