@@ -1,8 +1,8 @@
-import { relationalOperators } from "../../constants/operators";
-import { AbstractSyntaxTree } from "./AbstractSyntaxTree";
-import { BinaryOperatorSyntaxTree } from "./BinaryOperatorSyntaxTree";
+import { binaryArithmeticOperators } from "../../../constants/operators";
+import { AbstractSyntaxTree } from "../AbstractSyntaxTree";
+import { BinaryOperatorSyntaxTree } from "../BinaryOperatorSyntaxTree";
 
-export class RelationalOperatorSyntaxTree extends BinaryOperatorSyntaxTree {
+export class BinaryArithmeticOperatorSyntaxTree extends BinaryOperatorSyntaxTree {
   constructor(
     token: string,
     left: AbstractSyntaxTree | null = null,
@@ -20,9 +20,9 @@ export class RelationalOperatorSyntaxTree extends BinaryOperatorSyntaxTree {
     const lEval = this.children[0].evaluate();
     const rEval = this.children[1].evaluate();
 
-    if (this.token in relationalOperators) {
+    if (this.token in binaryArithmeticOperators) {
       if (typeof lEval === "number" && typeof rEval === "number") {
-        return relationalOperators[this.token].operation(lEval, rEval);
+        return binaryArithmeticOperators[this.token].operation(lEval, rEval);
       } else {
         throw new Error(
           `Operator "${this.token}" performs it's operation on numbers only`

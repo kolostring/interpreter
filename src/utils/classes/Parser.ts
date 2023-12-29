@@ -6,11 +6,11 @@ import {
   unaryLogicalOperators,
 } from "../constants/operators";
 import { AbstractSyntaxTree } from "./AST/AbstractSyntaxTree";
-import { BinaryArithmeticOperatorSyntaxTree } from "./AST/BinaryArithmeticOperatorSyntaxTree";
-import { BinaryLogicalOperatorSyntaxTree } from "./AST/BinaryLogicalOperatorSyntaxTree";
-import { EqualityOperatorSyntaxTree } from "./AST/EqualityOperatorSyntaxTree";
+import { BinaryArithmeticOperatorSyntaxTree } from "./AST/ArithmeticSyntaxTree/BinaryArithmeticOperatorSyntaxTree";
+import { BinaryLogicalOperatorSyntaxTree } from "./AST/LogicalSyntaxTree/BinaryLogicalOperatorSyntaxTree";
+import { EqualityOperatorSyntaxTree } from "./AST/LogicalSyntaxTree/EqualityOperatorSyntaxTree";
 import { OperandSyntaxTree } from "./AST/OperandSyntaxTree";
-import { RelationalOperatorSyntaxTree } from "./AST/RelationalOperatorSyntaxTree";
+import { RelationalOperatorSyntaxTree } from "./AST/LogicalSyntaxTree/RelationalOperatorSyntaxTree";
 import { UnaryOperatorSyntaxTree } from "./AST/UnaryOperatorSyntaxTree";
 import Tokenizer from "./Tokenizer";
 

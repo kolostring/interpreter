@@ -1,6 +1,6 @@
-import { equalityOperators } from "../../constants/operators";
-import { AbstractSyntaxTree } from "./AbstractSyntaxTree";
-import { BinaryOperatorSyntaxTree } from "./BinaryOperatorSyntaxTree";
+import { equalityOperators } from "../../../constants/operators";
+import { AbstractSyntaxTree } from "../AbstractSyntaxTree";
+import { BinaryOperatorSyntaxTree } from "../BinaryOperatorSyntaxTree";
 
 export class EqualityOperatorSyntaxTree extends BinaryOperatorSyntaxTree {
   constructor(

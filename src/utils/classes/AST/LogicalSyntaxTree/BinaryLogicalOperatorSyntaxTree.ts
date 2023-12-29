@@ -1,8 +1,8 @@
-import { binaryArithmeticOperators } from "../../constants/operators";
-import { AbstractSyntaxTree } from "./AbstractSyntaxTree";
-import { BinaryOperatorSyntaxTree } from "./BinaryOperatorSyntaxTree";
+import { binaryLogicalOperators } from "../../../constants/operators";
+import { AbstractSyntaxTree } from "../AbstractSyntaxTree";
+import { BinaryOperatorSyntaxTree } from "../BinaryOperatorSyntaxTree";
 
-export class BinaryArithmeticOperatorSyntaxTree extends BinaryOperatorSyntaxTree {
+export class BinaryLogicalOperatorSyntaxTree extends BinaryOperatorSyntaxTree {
   constructor(
     token: string,
     left: AbstractSyntaxTree | null = null,
@@ -20,12 +20,12 @@ export class BinaryArithmeticOperatorSyntaxTree extends BinaryOperatorSyntaxTree
     const lEval = this.children[0].evaluate();
     const rEval = this.children[1].evaluate();
 
-    if (this.token in binaryArithmeticOperators) {
-      if (typeof lEval === "number" && typeof rEval === "number") {
-        return binaryArithmeticOperators[this.token].operation(lEval, rEval);
+    if (this.token in binaryLogicalOperators) {
+      if (typeof lEval === "boolean" && typeof rEval === "boolean") {
+        return binaryLogicalOperators[this.token].operation(lEval, rEval);
       } else {
         throw new Error(
-          `Operator "${this.token}" performs it's operation on numbers only`
+          `Operator "${this.token}" performs it's operation on booleans only`
         );
       }
     }
