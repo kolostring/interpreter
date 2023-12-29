@@ -9,7 +9,12 @@ export class BinaryLogicalOperatorSyntaxTree extends BinaryOperatorSyntaxTree {
     right: AbstractSyntaxTree | null = null
   ) {
     super(token, left, right);
+
+    if (token in binaryLogicalOperators === false) {
+      throw new Error(`Invalid Operator "${this.token}`);
+    }
   }
+  
   public evaluate() {
     if (this.children[0] === null || this.children[1] === null) {
       throw new Error(
@@ -20,16 +25,12 @@ export class BinaryLogicalOperatorSyntaxTree extends BinaryOperatorSyntaxTree {
     const lEval = this.children[0].evaluate();
     const rEval = this.children[1].evaluate();
 
-    if (this.token in binaryLogicalOperators) {
-      if (typeof lEval === "boolean" && typeof rEval === "boolean") {
-        return binaryLogicalOperators[this.token].operation(lEval, rEval);
-      } else {
-        throw new Error(
-          `Operator "${this.token}" performs it's operation on booleans only`
-        );
-      }
+    if (typeof lEval === "boolean" && typeof rEval === "boolean") {
+      return binaryLogicalOperators[this.token].operation(lEval, rEval);
+    } else {
+      throw new Error(
+        `Operator "${this.token}" performs it's operation on booleans only`
+      );
     }
-
-    throw new Error(`Invalid Operator "${this.token}`);
   }
 }

@@ -1,7 +1,16 @@
 import { unaryLogicalOperators } from "../../../constants/operators";
+import { AbstractSyntaxTree } from "../AbstractSyntaxTree";
 import { UnaryOperatorSyntaxTree } from "../UnaryOperatorSyntaxTree";
 
-export class UnaryLogicalOperatorSyntaxTree extends UnaryOperatorSyntaxTree{
+export class UnaryLogicalOperatorSyntaxTree extends UnaryOperatorSyntaxTree {
+  constructor(token: string, child: AbstractSyntaxTree | null = null) {
+    super(token, child);
+
+    if (token in unaryLogicalOperators === false) {
+      throw new Error(`Invalid Operator "${this.token}`);
+    }
+  }
+
   public evaluate() {
     if (this.children[0] === null) {
       throw new Error(
@@ -11,16 +20,12 @@ export class UnaryLogicalOperatorSyntaxTree extends UnaryOperatorSyntaxTree{
 
     const childEval = this.children[0].evaluate();
 
-    if (this.token in unaryLogicalOperators) {
-      if (typeof childEval === "boolean") {
-        return unaryLogicalOperators[this.token].operation(childEval);
-      } else {
-        throw new Error(
-          `Operator "${this.token}" performs it's operation on booleans only`
-        );
-      }
+    if (typeof childEval === "boolean") {
+      return unaryLogicalOperators[this.token].operation(childEval);
+    } else {
+      throw new Error(
+        `Operator "${this.token}" performs it's operation on booleans only`
+      );
     }
-
-    throw new Error(`Invalid Operator "${this.token}`);
   }
-} 
+}
