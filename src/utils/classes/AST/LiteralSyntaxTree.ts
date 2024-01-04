@@ -1,24 +1,25 @@
+import { Token } from "../Tokenizer";
 import { AbstractSyntaxTree } from "./AbstractSyntaxTree";
 
 export class LiteralSyntaxTree extends AbstractSyntaxTree {
-  constructor(token: string) {
+  constructor(token: Token) {
     super(token, []);
   }
 
   public insertChild(child: AbstractSyntaxTree): void {
     throw new Error(
-      `Operands "${this.token}" cannot operate over ${child.getToken()}`
+      `Operands "${this.token.str}" cannot operate over ${child.getToken().str}`
     );
   }
 
   public evaluate() {
-    if(this.token === "true" || this.token === "false"){
-      return Boolean(this.token);
+    if(this.token.str === "true" || this.token.str === "false"){
+      return Boolean(this.token.str);
     }
-    return Number(this.token);
+    return Number(this.token.str);
   }
 
   public postfix() {
-    return this.token;
+    return this.token.str;
   }
 }

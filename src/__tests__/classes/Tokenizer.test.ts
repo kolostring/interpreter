@@ -1,59 +1,60 @@
 import { describe, expect, it } from "vitest";
 import Tokenizer from "../../utils/classes/Tokenizer";
+import { TOKEN } from "../../utils/constants/tokenTypes";
 
 const tokenizer = new Tokenizer();
 
 describe("Tokenizer", () => {
   it("should tokenize numbers", () => {
-    tokenizer.setStr("1 23 456");
-    ["1", "23", "456"].forEach((token) => {
-      expect(tokenizer.getNextToken()).toBe(token);
+    tokenizer.setInput("1 23 456");
+    ["1", "23", "456"].forEach((str) => {
+      expect(tokenizer.getNextToken().str).toBe(str);
     });
   });
 
   it("should tokenize words", () => {
-    tokenizer.setStr("a bc defg");
-    ["a", "bc", "defg"].forEach((token) => {
-      expect(tokenizer.getNextToken()).toBe(token);
+    tokenizer.setInput("a bc defg");
+    ["a", "bc", "defg"].forEach((str) => {
+      expect(tokenizer.getNextToken().str).toBe(str);
     });
   });
 
   it("should tokenize operators", () => {
-    tokenizer.setStr("- + */");
-    ["-", "+", "*", "/"].forEach((token) => {
-      expect(tokenizer.getNextToken()).toBe(token);
+    tokenizer.setInput("- + */");
+    ["-", "+", "*", "/"].forEach((str) => {
+      expect(tokenizer.getNextToken().str).toBe(str);
     });
   });
   it("should tokenize operators apart from words", () => {
-    tokenizer.setStr("a+bc/d");
-    ["a", "+", "bc", "/", "d"].forEach((token) => {
-      expect(tokenizer.getNextToken()).toBe(token);
+    tokenizer.setInput("a+bc/d");
+    ["a", "+", "bc", "/", "d"].forEach((str) => {
+      expect(tokenizer.getNextToken().str).toBe(str);
     });
   });
 
   it("should tokenize parenthesis apart from words and other operators", () => {
-    tokenizer.setStr("2+(3-(4*5)+ab)-cd");
-    ["2","+","(","3","-","(","4","*","5",")","+","ab",")","-","cd"].forEach((token) => {
-      expect(tokenizer.getNextToken()).toBe(token);
+    tokenizer.setInput("2+(3-(4*5)+ab)-cd");
+    ["2","+","(","3","-","(","4","*","5",")","+","ab",")","-","cd"].forEach((str) => {
+      expect(tokenizer.getNextToken().str).toBe(str);
     });
   });
 
   it("should tokenize logical operators", () => {
-    tokenizer.setStr("(a+b) > 12");
-    ["(", "a", "+", "b", ")", ">", "12"].forEach((token) => {
-      expect(tokenizer.getNextToken()).toBe(token);
+    tokenizer.setInput("(a+b) > 12");
+    ["(", "a", "+", "b", ")", ">", "12"].forEach((str) => {
+      expect(tokenizer.getNextToken().str).toBe(str);
     });
-    tokenizer.setStr("a<b&&c>=d||f!=g");
+    tokenizer.setInput("a<b&&c>=d||f!=g");
     ["a", "<", "b", "&&", "c", ">=", "d", "||", "f", "!=", "g"].forEach(
-      (token) => {
-        expect(tokenizer.getNextToken()).toBe(token);
+      (str) => {
+        expect(tokenizer.getNextToken().str).toBe(str);
       }
     );
   });
   
-  it("should return NULL if there's no token", ()=>{
-    tokenizer.setStr("1");
-    tokenizer.getNextToken();
-    expect(tokenizer.getNextToken()).toBeNull();
+  it("should return EOF if there's no token left", ()=>{
+    tokenizer.setInput("1");
+    tokenizer.advance();
+    expect(tokenizer.getNextToken().type).toBe(TOKEN.EOF);
   })
 });

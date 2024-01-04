@@ -1,11 +1,12 @@
+import { Token } from "../Tokenizer";
 import { AbstractSyntaxTree } from "./AbstractSyntaxTree";
 
-export abstract class BinaryOperatorSyntaxTree extends AbstractSyntaxTree {
+export class BinaryOperatorSyntaxTree extends AbstractSyntaxTree {
   private left = 0;
   private right = 1;
 
   constructor(
-    token: string,
+    token: Token,
     left: AbstractSyntaxTree | null = null,
     right: AbstractSyntaxTree | null = null
   ) {
@@ -19,14 +20,18 @@ export abstract class BinaryOperatorSyntaxTree extends AbstractSyntaxTree {
       this.children[this.right] = child;
     } else {
       throw new Error(
-        `Binary Operator "${this.token}" cannot perform it's operation on more than two operands`
+        `Binary Operator "${this.token.str}" cannot perform it's operation on more than two operands`
       );
     }
   }
 
+  public evaluate(): number | boolean {
+    throw new Error("Method not implemented.");
+  }
+
   public postfix() {
     return `${this.children[0]?.postfix()} ${this.children[1]?.postfix()} ${
-      this.token
+      this.token.str
     }`;
   }
 }

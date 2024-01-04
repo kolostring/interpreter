@@ -1,102 +1,122 @@
-import {
-  binaryArithmeticOperators,
-  binaryLogicalOperators,
-  equalityOperators,
-  relationalOperators,
-  unaryArithmeticOperators,
-  unaryLogicalOperators,
-} from "../constants/operators";
+import { operators } from "../constants/operators";
+import { TOKEN } from "../constants/tokenTypes";
+
+export type Token = {
+  str: string;
+  type: number;
+  row: number;
+  col: number;
+};
 
 export default class Tokenizer {
-  private str: string = "";
+  private input: string = "";
   private ptr: number = 0;
-  private currentToken: string | null = null;
+  private row: number = 0;
+  private col: number = -1;
+  private currentToken: Token = {
+    str: "bof",
+    type: TOKEN.BOF,
+    col: this.col,
+    row: this.row
+  };
 
   constructor(str: string = "") {
-    this.setStr(str);
+    this.setInput(str);
   }
 
-  public setStr(str: string) {
-    this.str = str;
+  public setInput(input: string) {
+    this.input = input;
     this.ptr = 0;
-    this.currentToken = null;
+    this.row = 0;
+    this.col = -1;
+    this.currentToken = {
+      str: "bof",
+      type: TOKEN.BOF,
+      col: this.col,
+      row: this.row
+    }
+  }
+
+  private setCurrentToken(str: string, tokenID: number) {
+    this.currentToken = {
+      str: str,
+      type: tokenID,
+      row: this.row,
+      col: this.col - str.length,
+    };
   }
 
   private getCurrentChar() {
-    return this.str.charAt(this.ptr);
+    return this.input.charAt(this.ptr);
   }
 
   private skipWhiteSpaces() {
-    while (this.getCurrentChar() === " ") {
+    while (this.getCurrentChar() === " " || this.getCurrentChar() === "\n") {
       this.ptr++;
+      this.col++;
+      if (this.getCurrentChar() === "\n") {
+        this.col = 0;
+        this.row++;
+      }
     }
   }
 
-  private isOperator(token: string) {
-    return (
-      token in binaryArithmeticOperators ||
-      token in binaryLogicalOperators ||
-      token in relationalOperators ||
-      token in equalityOperators ||
-      token in unaryArithmeticOperators ||
-      token in unaryLogicalOperators ||
-      token === "(" ||
-      token === ")" ||
-      token === "=" ||
-      token === "&" ||
-      token === "|" ||
-      token === ";"
-    );
-  }
-
-  private getOperator() {
-    let token = "";
+  private getOperator(): string {
+    let str = "";
 
     do {
-      token += this.getCurrentChar();
+      str += this.getCurrentChar();
       this.ptr++;
     } while (
-      this.ptr < this.str.length &&
-      this.isOperator(token + this.getCurrentChar())
+      this.ptr < this.input.length &&
+      str + this.getCurrentChar() in operators
     );
 
-    return token;
+    return str;
   }
 
   public advance(): void {
-    let token = "";
+    let str = "";
 
-    if (this.ptr >= this.str.length) {
-      this.currentToken = null;
+    if (this.ptr >= this.input.length) {
+      this.currentToken = {
+        str: "\0",
+        type: TOKEN.EOF,
+        row: this.row,
+        col: this.col,
+      };
       return;
     }
 
-    if (this.getCurrentChar() === " ") {
+    if (this.getCurrentChar() === " " || this.getCurrentChar() === "\n") {
       this.skipWhiteSpaces();
     }
 
-    if (this.isOperator(this.getCurrentChar())) {
-      this.currentToken = this.getOperator();
+    if (this.getCurrentChar() in operators) {
+      str = this.getOperator();
+      this.setCurrentToken(str, operators[str].tokenID);
       return;
     }
 
     do {
-      token += this.getCurrentChar();
+      str += this.getCurrentChar();
       this.ptr++;
+      this.col++;
     } while (
-      this.ptr < this.str.length &&
+      this.ptr < this.input.length &&
       this.getCurrentChar() !== " " &&
-      !this.isOperator(this.getCurrentChar())
+      this.getCurrentChar() !== "\n" &&
+      !(this.getCurrentChar() in operators)
     );
 
-    this.currentToken = token;
+    this.setCurrentToken(str, TOKEN.VARIABLE);
   }
 
   public getCurrentPosition() {
     return this.ptr;
   }
 
-  public getCurrentToken() {
+  public getCurrentToken(): Token {
     return this.currentToken;
   }
 
