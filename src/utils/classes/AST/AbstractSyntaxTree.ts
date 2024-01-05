@@ -9,15 +9,10 @@ export abstract class AbstractSyntaxTree {
     this.children = children;
   }
 
-  public getNode(index: number) {
-    return this.children[index];
-  }
-
   public getToken() {
     return this.token;
   }
 
-  public abstract insertChild(child: AbstractSyntaxTree): void;
   public abstract evaluate(): number | boolean;
   public abstract postfix(): string;
 }

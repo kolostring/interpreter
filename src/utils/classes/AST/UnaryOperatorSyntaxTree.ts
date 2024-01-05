@@ -6,16 +6,6 @@ export class UnaryOperatorSyntaxTree extends AbstractSyntaxTree {
     super(token, [child]);
   }
 
-  public insertChild(child: AbstractSyntaxTree): void {
-    if (this.children[0] === null) {
-      this.children[0] = child;
-    } else {
-      throw new Error(
-        `Unary Operator "${this.token.str}" cannot perform it's operation on more than one operand`
-      );
-    }
-  }
-
   public evaluate(): number | boolean {
     throw new Error("Method not implemented.");
   }
