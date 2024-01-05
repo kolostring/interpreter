@@ -9,6 +9,10 @@ export abstract class AbstractSyntaxTree {
     this.children = children;
   }
 
+  public getChildren() {
+    return this.children;
+  }
+
   public getToken() {
     return this.token;
   }
