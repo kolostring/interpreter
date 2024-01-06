@@ -17,6 +17,5 @@ export abstract class AbstractSyntaxTree {
     return this.token;
   }
 
-  public abstract evaluate(): number | boolean;
   public abstract postfix(): string;
 }

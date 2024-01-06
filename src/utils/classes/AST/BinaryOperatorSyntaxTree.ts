@@ -10,10 +10,6 @@ export class BinaryOperatorSyntaxTree extends AbstractSyntaxTree {
     super(token, [left, right]);
   }
 
-  public evaluate(): number | boolean {
-    throw new Error("Method not implemented.");
-  }
-
   public postfix() {
     return `${this.children[0]?.postfix()} ${this.children[1]?.postfix()} ${
       this.token.str
