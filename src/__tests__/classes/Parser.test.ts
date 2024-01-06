@@ -69,6 +69,12 @@ describe("Parser", () => {
     expect(parser.sentence().postfix()).toBe("123 3 ==");
     parser.setInput("12+3 != (45^6);");
     expect(parser.sentence().postfix()).toBe("12 3 + 45 6 ^ !=");
+    parser.setInput("1 == 2 != 4;");
+    expect(parser.sentence().postfix()).toBe("1 2 == 4 !=");
+    parser.setInput("1 == (2 != 30);");
+    expect(parser.sentence().postfix()).toBe("1 2 30 != ==");
+    parser.setInput("1 == (2 == ( 3 == 4));");
+    expect(parser.sentence().postfix()).toBe("1 2 3 4 == == ==");
   });
 
   it("should parse Logical Operations", () => {
@@ -99,19 +105,6 @@ describe("Parser", () => {
 
   it("should not allow to have Relational Operators next to eachother", ()=>{
     parser.setInput("1 < 2 >= 4;");
-    expect(()=>{parser.sentence()}).toThrowError();
-    parser.setInput("1 >= (2 < 30);");
-    expect(()=>{parser.sentence()}).toThrowError();
-    parser.setInput("1 < (2 > ( 3 > 4));");
-    expect(()=>{parser.sentence()}).toThrowError();
-  })
-
-  it("should not allow to have Equality Operators next to eachother", ()=>{
-    parser.setInput("1 == 2 != 4;");
-    expect(()=>{parser.sentence()}).toThrowError();
-    parser.setInput("1 == (2 !== 30);");
-    expect(()=>{parser.sentence()}).toThrowError();
-    parser.setInput("1 == (2 == ( 3 == 4);");
     expect(()=>{parser.sentence()}).toThrowError();
   })
 });

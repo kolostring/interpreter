@@ -1,5 +1,4 @@
 import {
-  binaryLogicalOperators,
   equalityOperators,
   relationalOperators,
   unaryArithmeticOperators,
@@ -23,48 +22,41 @@ export default class Parser {
   }
 
   private eat(token: string) {
-    if (this.tokenizer.getCurrentToken().str !== token) {
+    const currToken = this.tokenizer.getCurrentToken();
+    if (currToken.str !== token) {
       throw new Error(
-        `"${token}" expected at col: ${this.tokenizer.getCurrentPosition()}`
+        `"${token}" expected at row: "${currToken.row}" col: "${currToken.col}". Got "${currToken.str} instead."`
       );
     }
     this.tokenizer.advance();
   }
 
   private basePower(): AbstractSyntaxTree {
-    const currentToken = this.tokenizer.getNextToken();
+    const currToken = this.tokenizer.getNextToken();
 
-    if (currentToken === null) {
-      throw new Error(
-        `Expression expected at col: ${this.tokenizer.getCurrentPosition()}`
-      );
-    }
-    if (currentToken.str in unaryArithmeticOperators) {
-      return new UnaryOperatorSyntaxTree(
-        currentToken,
-        this.basePower()
-      );
-    }
-    if (currentToken.str in unaryLogicalOperators) {
-      return new UnaryOperatorSyntaxTree(currentToken, this.basePower());
+    if (
+      currToken.str in unaryArithmeticOperators ||
+      currToken.str in unaryLogicalOperators
+    ) {
+      return new UnaryOperatorSyntaxTree(currToken, this.basePower());
     }
     if (
-      !isNaN(Number(currentToken.str)) ||
-      currentToken.str === "true" ||
-      currentToken.str === "false"
+      !isNaN(Number(currToken.str)) ||
+      currToken.str === "true" ||
+      currToken.str === "false"
     ) {
-      const root = new LiteralSyntaxTree(currentToken);
+      const root = new LiteralSyntaxTree(currToken);
       this.tokenizer.advance();
       return root;
     }
-    if (currentToken.str === "(") {
+    if (currToken.str === "(") {
       const root = this.expression();
       this.eat(")");
       return root;
     }
 
     throw new Error(
-      `Invalid token "${currentToken.str}" at col: ${this.tokenizer.getCurrentPosition()}`
+      `Expression expected at row: "${currToken.row}" col: "${currToken.col}". Got "${currToken.str} instead."`
     );
   }
 
@@ -72,7 +64,11 @@ export default class Parser {
     let root = this.basePower();
 
     while (this.tokenizer.getCurrentToken().str === "^") {
-      root = new BinaryOperatorSyntaxTree(this.tokenizer.getCurrentToken(), root, this.factor());
+      root = new BinaryOperatorSyntaxTree(
+        this.tokenizer.getCurrentToken(),
+        root,
+        this.factor()
+      );
     }
 
     return root;
@@ -115,23 +111,12 @@ export default class Parser {
   private relation(): AbstractSyntaxTree {
     let root = this.arithmeitcExpression();
 
-    const currToken = this.tokenizer.getCurrentToken();
-    if (currToken != null && currToken.str in relationalOperators) {
-      const rightExp = this.arithmeitcExpression();
-      if (
-        rightExp.getToken().str in
-        {
-          ...relationalOperators,
-          ...binaryLogicalOperators,
-          ...equalityOperators,
-          ...unaryLogicalOperators,
-        }
-      ) {
-        throw new Error(
-          `Operator ${currToken.str} can't perform operation on booleans`
-        );
-      }
-      root = new BinaryOperatorSyntaxTree(currToken, root, rightExp);
+    if (this.tokenizer.getCurrentToken().str in relationalOperators) {
+      root = new BinaryOperatorSyntaxTree(
+        this.tokenizer.getCurrentToken(),
+        root,
+        this.arithmeitcExpression()
+      );
     }
 
     return root;
@@ -140,9 +125,12 @@ export default class Parser {
   private equality(): AbstractSyntaxTree {
     let root = this.relation();
 
-    const currToken = this.tokenizer.getCurrentToken();
-    if (currToken != null && currToken.str in equalityOperators) {
-      root = new BinaryOperatorSyntaxTree(currToken, root, this.relation());
+    while (this.tokenizer.getCurrentToken().str in equalityOperators) {
+      root = new BinaryOperatorSyntaxTree(
+        this.tokenizer.getCurrentToken(),
+        root,
+        this.relation()
+      );
     }
 
     return root;
@@ -152,7 +140,11 @@ export default class Parser {
     let root = this.equality();
 
     while (this.tokenizer.getCurrentToken().str === "&&") {
-      root = new BinaryOperatorSyntaxTree(this.tokenizer.getCurrentToken(), root, this.equality());
+      root = new BinaryOperatorSyntaxTree(
+        this.tokenizer.getCurrentToken(),
+        root,
+        this.equality()
+      );
     }
 
     return root;
