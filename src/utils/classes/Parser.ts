@@ -4,10 +4,12 @@ import {
   unaryArithmeticOperators,
   unaryLogicalOperators,
 } from "../constants/operators";
+import { TOKEN } from "../constants/tokenTypes";
 import { AbstractSyntaxTree } from "./AST/AbstractSyntaxTree";
 import { BinaryOperatorSyntaxTree } from "./AST/BinaryOperatorSyntaxTree";
 import { LiteralSyntaxTree } from "./AST/LiteralSyntaxTree";
 import { UnaryOperatorSyntaxTree } from "./AST/UnaryOperatorSyntaxTree";
+import { VariableSyntaxTree } from "./AST/VariableSyntaxTree";
 import Tokenizer from "./Tokenizer";
 
 export default class Parser {
@@ -53,6 +55,10 @@ export default class Parser {
       const root = this.expression();
       this.eat(")");
       return root;
+    }
+    if (currToken.type === TOKEN.VARIABLE){
+      this.tokenizer.advance();
+      return new VariableSyntaxTree(currToken);
     }
 
     throw new Error(

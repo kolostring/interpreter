@@ -89,6 +89,11 @@ describe("Parser", () => {
     expect(parser.sentence().postfix()).toBe("12 3 == (!) 4 5 > (!) 6 7 <= || (!) &&");
   })
 
+  it("should parse Variables", () => {
+    parser.setInput("_ab + cd2 / efg;");
+    expect(parser.sentence().postfix()).toBe("_ab cd2 efg / +");
+  })
+
   it("should not allow to have missing operands", () => {
     parser.setInput("1-;");
     expect(()=>{parser.sentence()}).toThrowError();
