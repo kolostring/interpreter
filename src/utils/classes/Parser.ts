@@ -23,11 +23,11 @@ export default class Parser {
     this.tokenizer.setInput(input);
   }
 
-  private eat(token: string) {
+  private eat(token: TOKEN) {
     const currToken = this.tokenizer.getCurrentToken();
-    if (currToken.str !== token) {
+    if (currToken.type !== token) {
       throw new Error(
-        `"${token}" expected at row: "${currToken.row}" col: "${currToken.col}". Got "${currToken.str} instead."`
+        `<${TOKEN[token]}> expected at row: "${currToken.row}" col: "${currToken.col}". Got <${TOKEN[currToken.type]}>("${currToken.str}") instead.`
       );
     }
     this.tokenizer.advance();
@@ -53,7 +53,7 @@ export default class Parser {
     }
     if (currToken.str === "(") {
       const root = this.expression();
-      this.eat(")");
+      this.eat(TOKEN.R_PARENTHESIS);
       return root;
     }
     if (currToken.type === TOKEN.VARIABLE){
@@ -62,7 +62,7 @@ export default class Parser {
     }
 
     throw new Error(
-      `Expression expected at row: "${currToken.row}" col: "${currToken.col}". Got "${currToken.str} instead."`
+      `Expression expected at row: "${currToken.row}" col: "${currToken.col}". Got <${TOKEN[currToken.type]}>("${currToken.str}") instead."`
     );
   }
 
@@ -176,7 +176,7 @@ export default class Parser {
 
   public sentence(): AbstractSyntaxTree {
     const root = this.expression();
-    this.eat(";");
+    this.eat(TOKEN.SEMI);
     return root;
   }
 }
