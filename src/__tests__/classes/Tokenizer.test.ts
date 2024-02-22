@@ -59,8 +59,8 @@ describe("Tokenizer", () => {
   })
   
   it("should return correct token type", ()=>{
-    tokenizer.setInput("123 true false variable {}()+-/*;");
-    [TOKEN.NUMBER, TOKEN.TRUE, TOKEN.FALSE, TOKEN.VARIABLE, TOKEN.L_BRACE, TOKEN.R_BRACE, TOKEN.L_PARENTHESIS, TOKEN.R_PARENTHESIS, TOKEN.PLUS, TOKEN.MINUS, TOKEN.DIV, TOKEN.MUL, TOKEN.SEMI].forEach((token)=>{
+    tokenizer.setInput("123 true false variable ={}()+-/*; && || != ==");
+    [TOKEN.NUMBER, TOKEN.TRUE, TOKEN.FALSE, TOKEN.VARIABLE, TOKEN.ASSIGN, TOKEN.L_BRACE, TOKEN.R_BRACE, TOKEN.L_PARENTHESIS, TOKEN.R_PARENTHESIS, TOKEN.PLUS, TOKEN.MINUS, TOKEN.DIV, TOKEN.MUL, TOKEN.SEMI, TOKEN.AND, TOKEN.OR, TOKEN.DIFFERENT, TOKEN.EQUAL].forEach((token)=>{
       expect(TOKEN[tokenizer.getNextToken().type]).toBe(TOKEN[token]);
     })
   })

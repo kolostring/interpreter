@@ -145,6 +145,9 @@ export const langOperators: {
   "|":{
     tokenID: TOKEN.V_LINE,
   },
+  "=":{
+    tokenID: TOKEN.ASSIGN,
+  }
 };
 
 export const operators = {
