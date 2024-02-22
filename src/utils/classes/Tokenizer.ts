@@ -28,11 +28,11 @@ export default class Tokenizer {
     this.input = input;
     this.ptr = 0;
     this.row = 0;
-    this.col = -1;
+    this.col = 0;
     this.currentToken = {
       str: "bof",
       type: TOKEN.BOF,
-      col: this.col,
+      col: -1,
       row: this.row
     }
   }
@@ -51,13 +51,15 @@ export default class Tokenizer {
   }
 
   private skipWhiteSpaces() {
-    while (this.getCurrentChar() === " " || this.getCurrentChar() === "\n") {
-      this.ptr++;
+    while (this.getCurrentChar() === " "|| this.getCurrentChar() === "\n") {
       this.col++;
+
       if (this.getCurrentChar() === "\n") {
         this.col = 0;
         this.row++;
       }
+      
+      this.ptr++;
     }
   }
 
@@ -67,6 +69,7 @@ export default class Tokenizer {
     do {
       str += this.getCurrentChar();
       this.ptr++;
+      this.col++;
     } while (
       this.ptr < this.input.length &&
       str + this.getCurrentChar() in operators

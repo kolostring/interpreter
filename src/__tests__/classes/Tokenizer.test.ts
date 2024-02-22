@@ -64,4 +64,14 @@ describe("Tokenizer", () => {
       expect(TOKEN[tokenizer.getNextToken().type]).toBe(TOKEN[token]);
     })
   })
+
+  it("should return correct row and column", ()=>{
+    tokenizer.setInput(`hello, world!\n123 + 4-3!=20`);
+
+    [[0,0],[5,0],[7,0],[12,0],[0,1],[4,1],[6,1],[7,1],[8,1],[9,1],[11,1]].forEach(([col, row])=>{
+      tokenizer.advance();
+      expect(tokenizer.getCurrentToken().col).toBe(col);
+      expect(tokenizer.getCurrentToken().row).toBe(row);
+    })
+  })
 });
