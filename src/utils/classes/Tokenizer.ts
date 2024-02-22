@@ -109,7 +109,18 @@ export default class Tokenizer {
       !(this.getCurrentChar() in operators)
     );
 
-    this.setCurrentToken(str, TOKEN.VARIABLE);
+    if(!isNaN(Number(str))){
+      this.setCurrentToken(str, TOKEN.NUMBER)
+    }
+    else if(str === "true"){
+      this.setCurrentToken(str, TOKEN.TRUE)
+    }
+    else if(str === "false"){
+      this.setCurrentToken(str, TOKEN.FALSE)
+    }
+    else{
+      this.setCurrentToken(str, TOKEN.VARIABLE);
+    }
   }
 
   public getCurrentPosition() {

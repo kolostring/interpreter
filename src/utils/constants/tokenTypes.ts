@@ -27,4 +27,5 @@ export enum TOKEN {
   NOT,
   TRUE,
   FALSE,
+  NUMBER,
 }
