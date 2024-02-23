@@ -68,8 +68,9 @@ describe("Tokenizer", () => {
   it("should return correct row and column", ()=>{
     tokenizer.setInput(`hello, world!\n123 + 4-3!=20`);
 
-    [[0,0],[5,0],[7,0],[12,0],[0,1],[4,1],[6,1],[7,1],[8,1],[9,1],[11,1]].forEach(([col, row])=>{
+    [[0,0,0],[5,5,0],[7,7,0],[12,12,0],[14,0,1],[18,4,1],[20,6,1],[21,7,1],[22,8,1],[23,9,1],[25,11,1]].forEach(([pos, col, row])=>{
       tokenizer.advance();
+      expect(tokenizer.getCurrentToken().pos).toBe(pos);
       expect(tokenizer.getCurrentToken().col).toBe(col);
       expect(tokenizer.getCurrentToken().row).toBe(row);
     })

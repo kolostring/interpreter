@@ -4,6 +4,7 @@ import { TokenKind } from "../constants/tokenKinds";
 export type Token = {
   str: string;
   type: TokenKind;
+  pos: number
   row: number;
   col: number;
 };
@@ -16,8 +17,9 @@ export default class Tokenizer {
   private currentToken: Token = {
     str: "bof",
     type: TokenKind.BOF,
-    col: this.col,
-    row: this.row
+    pos: -1,
+    row: this.row,
+    col: -1,
   };
 
   constructor(str: string = "") {
@@ -32,8 +34,9 @@ export default class Tokenizer {
     this.currentToken = {
       str: "bof",
       type: TokenKind.BOF,
+      pos: -1,
+      row: this.row,
       col: -1,
-      row: this.row
     }
   }
 
@@ -41,6 +44,7 @@ export default class Tokenizer {
     this.currentToken = {
       str: str,
       type: tokenID,
+      pos: this.ptr - str.length,
       row: this.row,
       col: this.col - str.length,
     };
@@ -85,6 +89,7 @@ export default class Tokenizer {
       this.currentToken = {
         str: "\0",
         type: TokenKind.EOF,
+        pos: this.ptr,
         row: this.row,
         col: this.col,
       };
