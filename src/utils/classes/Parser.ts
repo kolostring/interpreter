@@ -4,7 +4,7 @@ import {
   unaryArithmeticOperators,
   unaryLogicalOperators,
 } from "../constants/operators";
-import { TOKEN } from "../constants/tokenTypes";
+import { TokenKind } from "../constants/tokenKinds";
 import { AbstractSyntaxTree } from "./AST/AbstractSyntaxTree";
 import { BinaryOperatorSyntaxTree } from "./AST/BinaryOperatorSyntaxTree";
 import { LiteralSyntaxTree } from "./AST/LiteralSyntaxTree";
@@ -23,11 +23,11 @@ export default class Parser {
     this.tokenizer.setInput(input);
   }
 
-  private eat(token: TOKEN) {
+  private eat(token: TokenKind) {
     const currToken = this.tokenizer.getCurrentToken();
     if (currToken.type !== token) {
       throw new Error(
-        `<${TOKEN[token]}> expected at row: "${currToken.row}" col: "${currToken.col}". Got <${TOKEN[currToken.type]}>("${currToken.str}") instead.`
+        `<${TokenKind[token]}> expected at row: "${currToken.row}" col: "${currToken.col}". Got <${TokenKind[currToken.type]}>("${currToken.str}") instead.`
       );
     }
     this.tokenizer.advance();
@@ -53,16 +53,16 @@ export default class Parser {
     }
     if (currToken.str === "(") {
       const root = this.expression();
-      this.eat(TOKEN.R_PARENTHESIS);
+      this.eat(TokenKind.R_PARENTHESIS);
       return root;
     }
-    if (currToken.type === TOKEN.VARIABLE){
+    if (currToken.type === TokenKind.VARIABLE){
       this.tokenizer.advance();
       return new VariableSyntaxTree(currToken);
     }
 
     throw new Error(
-      `Expression expected at row: "${currToken.row}" col: "${currToken.col}". Got <${TOKEN[currToken.type]}>("${currToken.str}") instead."`
+      `Expression expected at row: "${currToken.row}" col: "${currToken.col}". Got <${TokenKind[currToken.type]}>("${currToken.str}") instead."`
     );
   }
 
@@ -176,7 +176,7 @@ export default class Parser {
 
   public sentence(): AbstractSyntaxTree {
     const root = this.expression();
-    this.eat(TOKEN.SEMI);
+    this.eat(TokenKind.SEMI);
     return root;
   }
 }

@@ -1,4 +1,4 @@
-export enum TOKEN {
+export enum TokenKind {
   BOF,
   EOF,
   VARIABLE,

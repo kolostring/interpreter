@@ -1,4 +1,4 @@
-import { TOKEN } from "./tokenTypes";
+import { TokenKind } from "./tokenKinds";
 
 type OperatorInfo = {
   tokenID: number;
@@ -33,53 +33,53 @@ export const binaryArithmeticOperators: {
 } = {
   "+": {
     operation: (a, b) => a + b,
-    tokenID: TOKEN.PLUS,
+    tokenID: TokenKind.PLUS,
   },
   "-": {
     operation: (a, b) => a - b,
-    tokenID: TOKEN.MINUS,
+    tokenID: TokenKind.MINUS,
   },
   "*": {
     operation: (a, b) => a * b,
-    tokenID: TOKEN.MUL,
+    tokenID: TokenKind.MUL,
   },
   "/": {
     operation: (a, b) => a / b,
-    tokenID: TOKEN.DIV,
+    tokenID: TokenKind.DIV,
   },
   "^": {
     operation: (a, b) => Math.pow(a, b),
-    tokenID: TOKEN.POWER,
+    tokenID: TokenKind.POWER,
   },
 };
 
 export const relationalOperators: { [key: string]: RelationalOperator } = {
   "<": {
     operation: (a, b) => a < b,
-    tokenID: TOKEN.LESS_THAN,
+    tokenID: TokenKind.LESS_THAN,
   },
   "<=": {
     operation: (a, b) => a <= b,
-    tokenID: TOKEN.LESS_OR_EQUAL_THAN,
+    tokenID: TokenKind.LESS_OR_EQUAL_THAN,
   },
   ">": {
     operation: (a, b) => a > b,
-    tokenID: TOKEN.GREATER_THAN,
+    tokenID: TokenKind.GREATER_THAN,
   },
   ">=": {
     operation: (a, b) => a >= b,
-    tokenID: TOKEN.GREATER_OR_EQUAL_THAN,
+    tokenID: TokenKind.GREATER_OR_EQUAL_THAN,
   },
 };
 
 export const equalityOperators: { [key: string]: EqualityOperator } = {
   "==": {
     operation: (a, b) => a === b,
-    tokenID: TOKEN.EQUAL,
+    tokenID: TokenKind.EQUAL,
   },
   "!=": {
     operation: (a, b) => a !== b,
-    tokenID: TOKEN.DIFFERENT,
+    tokenID: TokenKind.DIFFERENT,
   },
 };
 
@@ -88,11 +88,11 @@ export const binaryLogicalOperators: {
 } = {
   "&&": {
     operation: (a, b) => a && b,
-    tokenID: TOKEN.AND,
+    tokenID: TokenKind.AND,
   },
   "||": {
     operation: (a, b) => a || b,
-    tokenID: TOKEN.OR,
+    tokenID: TokenKind.OR,
   },
 };
 
@@ -101,11 +101,11 @@ export const unaryArithmeticOperators: {
 } = {
   "+": {
     operation: (a) => a,
-    tokenID: TOKEN.PLUS,
+    tokenID: TokenKind.PLUS,
   },
   "-": {
     operation: (a) => a * -1,
-    tokenID: TOKEN.MINUS,
+    tokenID: TokenKind.MINUS,
   },
 };
 
@@ -114,7 +114,7 @@ export const unaryLogicalOperators: {
 } = {
   "!": {
     operation: (a) => !a,
-    tokenID: TOKEN.NOT,
+    tokenID: TokenKind.NOT,
   },
 };
 
@@ -122,31 +122,31 @@ export const langOperators: {
   [key: string]: OperatorInfo;
 } = {
   "(": {
-    tokenID: TOKEN.L_PARENTHESIS,
+    tokenID: TokenKind.L_PARENTHESIS,
   },
   ")": {
-    tokenID: TOKEN.R_PARENTHESIS,
+    tokenID: TokenKind.R_PARENTHESIS,
   },
   "{": {
-    tokenID: TOKEN.L_BRACE,
+    tokenID: TokenKind.L_BRACE,
   },
   "}": {
-    tokenID: TOKEN.R_BRACE,
+    tokenID: TokenKind.R_BRACE,
   },
   ";": {
-    tokenID: TOKEN.SEMI,
+    tokenID: TokenKind.SEMI,
   },
   ",": {
-    tokenID: TOKEN.COMMA,
+    tokenID: TokenKind.COMMA,
   },
   "&":{
-    tokenID: TOKEN.AMPERSAND,
+    tokenID: TokenKind.AMPERSAND,
   },
   "|":{
-    tokenID: TOKEN.V_LINE,
+    tokenID: TokenKind.V_LINE,
   },
   "=":{
-    tokenID: TOKEN.ASSIGN,
+    tokenID: TokenKind.ASSIGN,
   }
 };
 

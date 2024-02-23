@@ -1,9 +1,9 @@
 import { operators } from "../constants/operators";
-import { TOKEN } from "../constants/tokenTypes";
+import { TokenKind } from "../constants/tokenKinds";
 
 export type Token = {
   str: string;
-  type: number;
+  type: TokenKind;
   row: number;
   col: number;
 };
@@ -15,7 +15,7 @@ export default class Tokenizer {
   private col: number = -1;
   private currentToken: Token = {
     str: "bof",
-    type: TOKEN.BOF,
+    type: TokenKind.BOF,
     col: this.col,
     row: this.row
   };
@@ -31,7 +31,7 @@ export default class Tokenizer {
     this.col = 0;
     this.currentToken = {
       str: "bof",
-      type: TOKEN.BOF,
+      type: TokenKind.BOF,
       col: -1,
       row: this.row
     }
@@ -84,7 +84,7 @@ export default class Tokenizer {
     if (this.ptr >= this.input.length) {
       this.currentToken = {
         str: "\0",
-        type: TOKEN.EOF,
+        type: TokenKind.EOF,
         row: this.row,
         col: this.col,
       };
@@ -113,16 +113,16 @@ export default class Tokenizer {
     );
 
     if(!isNaN(Number(str))){
-      this.setCurrentToken(str, TOKEN.NUMBER)
+      this.setCurrentToken(str, TokenKind.NUMBER)
     }
     else if(str === "true"){
-      this.setCurrentToken(str, TOKEN.TRUE)
+      this.setCurrentToken(str, TokenKind.TRUE)
     }
     else if(str === "false"){
-      this.setCurrentToken(str, TOKEN.FALSE)
+      this.setCurrentToken(str, TokenKind.FALSE)
     }
     else{
-      this.setCurrentToken(str, TOKEN.VARIABLE);
+      this.setCurrentToken(str, TokenKind.VARIABLE);
     }
   }
 

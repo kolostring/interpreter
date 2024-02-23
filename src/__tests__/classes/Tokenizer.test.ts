@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import Tokenizer from "../../utils/classes/Tokenizer";
-import { TOKEN } from "../../utils/constants/tokenTypes";
+import { TokenKind } from "../../utils/constants/tokenKinds";
 
 const tokenizer = new Tokenizer();
 
@@ -55,13 +55,13 @@ describe("Tokenizer", () => {
   it("should return EOF if there's no token left", ()=>{
     tokenizer.setInput("1");
     tokenizer.advance();
-    expect(tokenizer.getNextToken().type).toBe(TOKEN.EOF);
+    expect(tokenizer.getNextToken().type).toBe(TokenKind.EOF);
   })
   
   it("should return correct token type", ()=>{
     tokenizer.setInput("123 true false variable ={}()+-/*; && || != ==");
-    [TOKEN.NUMBER, TOKEN.TRUE, TOKEN.FALSE, TOKEN.VARIABLE, TOKEN.ASSIGN, TOKEN.L_BRACE, TOKEN.R_BRACE, TOKEN.L_PARENTHESIS, TOKEN.R_PARENTHESIS, TOKEN.PLUS, TOKEN.MINUS, TOKEN.DIV, TOKEN.MUL, TOKEN.SEMI, TOKEN.AND, TOKEN.OR, TOKEN.DIFFERENT, TOKEN.EQUAL].forEach((token)=>{
-      expect(TOKEN[tokenizer.getNextToken().type]).toBe(TOKEN[token]);
+    [TokenKind.NUMBER, TokenKind.TRUE, TokenKind.FALSE, TokenKind.VARIABLE, TokenKind.ASSIGN, TokenKind.L_BRACE, TokenKind.R_BRACE, TokenKind.L_PARENTHESIS, TokenKind.R_PARENTHESIS, TokenKind.PLUS, TokenKind.MINUS, TokenKind.DIV, TokenKind.MUL, TokenKind.SEMI, TokenKind.AND, TokenKind.OR, TokenKind.DIFFERENT, TokenKind.EQUAL].forEach((token)=>{
+      expect(TokenKind[tokenizer.getNextToken().type]).toBe(TokenKind[token]);
     })
   })
 
