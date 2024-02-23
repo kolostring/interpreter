@@ -75,4 +75,15 @@ describe("Tokenizer", () => {
       expect(tokenizer.getCurrentToken().row).toBe(row);
     })
   })
+
+  it("should peek tokens correctly without modifying position", ()=>{
+    tokenizer.setInput("ab cd fg");
+    tokenizer.advance();
+
+    ["ab", "cd", "fg"].forEach((str, index)=>{
+      expect(tokenizer.peekToken(index).str).toBe(str);
+    })
+
+    expect(tokenizer.getCurrentToken().str).toBe("ab");
+  })
 });

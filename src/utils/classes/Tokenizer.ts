@@ -139,6 +139,22 @@ export default class Tokenizer {
     return this.currentToken;
   }
 
+  public peekToken(nToken: number): Token {
+    const currToken = this.currentToken
+    const currPtr = this.ptr
+
+    while(--nToken >= 0){
+      this.advance();
+    }
+
+    const peekedToken = this.currentToken
+
+    this.currentToken = currToken
+    this.ptr = currPtr
+
+    return peekedToken
+  }
+
   public getNextToken() {
     this.advance();
     return this.getCurrentToken();
