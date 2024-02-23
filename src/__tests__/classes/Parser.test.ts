@@ -94,6 +94,11 @@ describe("Parser", () => {
     expect(parser.sentence().postfix()).toBe("_ab cd2 efg / +");
   })
 
+  it("should parse Variable assignment", ()=>{
+    parser.setInput("a = 123 + 4;");
+    expect(parser.sentence().postfix()).toBe("a 123 4 + =");
+  })
+
   it("should not allow to have missing operands", () => {
     parser.setInput("1-;");
     expect(()=>{parser.sentence()}).toThrowError();
@@ -110,6 +115,13 @@ describe("Parser", () => {
 
   it("should not allow to have Relational Operators next to eachother", ()=>{
     parser.setInput("1 < 2 >= 4;");
+    expect(()=>{parser.sentence()}).toThrowError();
+  })
+
+  it("should not allow to assign to an expression", () => {
+    parser.setInput("123 = 3;");
+    expect(()=>{parser.sentence()}).toThrowError();
+    parser.setInput("12 + 3 = 45;");
     expect(()=>{parser.sentence()}).toThrowError();
   })
 });

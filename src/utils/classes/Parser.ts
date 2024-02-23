@@ -174,8 +174,25 @@ export default class Parser {
     return this.disjunction();
   }
 
+  private variableAssignment() : AbstractSyntaxTree {
+    let root = new VariableSyntaxTree(this.tokenizer.getNextToken());
+    console.log(root.getToken().str)
+    
+    root = new BinaryOperatorSyntaxTree(this.tokenizer.getNextToken(), root, this.expression())
+
+    return root;
+  }
+
   public sentence(): AbstractSyntaxTree {
-    const root = this.expression();
+    let root;
+
+    if(this.tokenizer.peekToken(1).type === TokenKind.SYMBOL &&
+      this.tokenizer.peekToken(2).type === TokenKind.ASSIGN){
+        root = this.variableAssignment()
+    }else{
+      root = this.expression()
+    }
+
     this.eat(TokenKind.SEMI);
     return root;
   }
