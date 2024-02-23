@@ -56,7 +56,7 @@ export default class Parser {
       this.eat(TokenKind.R_PARENTHESIS);
       return root;
     }
-    if (currToken.type === TokenKind.VARIABLE){
+    if (currToken.type === TokenKind.SYMBOL){
       this.tokenizer.advance();
       return new VariableSyntaxTree(currToken);
     }

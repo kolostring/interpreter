@@ -127,7 +127,7 @@ export default class Tokenizer {
       this.setCurrentToken(str, TokenKind.FALSE)
     }
     else{
-      this.setCurrentToken(str, TokenKind.VARIABLE);
+      this.setCurrentToken(str, TokenKind.SYMBOL);
     }
   }
 

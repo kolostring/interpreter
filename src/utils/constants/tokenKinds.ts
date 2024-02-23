@@ -1,7 +1,7 @@
 export enum TokenKind {
   BOF,
   EOF,
-  VARIABLE,
+  SYMBOL,
   L_PARENTHESIS,
   R_PARENTHESIS,
   L_BRACE,
