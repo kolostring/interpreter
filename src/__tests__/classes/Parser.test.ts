@@ -99,6 +99,20 @@ describe("Parser", () => {
     expect(parser.sentence().postfix()).toBe("a 123 4 + =");
   })
 
+  it("should parse Variable declaration", ()=>{
+    parser.setInput("int a;")
+    expect(parser.sentence().postfix()).toBe("int (a)");
+    parser.setInput("int a, b, c;")
+    expect(parser.sentence().postfix()).toBe("int (a), (b), (c)");
+    parser.setInput("int a = 12;")
+    expect(parser.sentence().postfix()).toBe("int (a 12 =)");
+    parser.setInput("int a = 12 * 3 + 4;")
+    expect(parser.sentence().postfix()).toBe("int (a 12 3 * 4 + =)");
+
+    parser.setInput("int a = 12*3+4, b, c = 56 * (7 + 8);")
+    expect(parser.sentence().postfix()).toBe("int (a 12 3 * 4 + =), (b), (c 56 7 8 + * =)");
+  })
+
   it("should not allow to have missing operands", () => {
     parser.setInput("1-;");
     expect(()=>{parser.sentence()}).toThrowError();

@@ -9,6 +9,7 @@ import { AbstractSyntaxTree } from "./AST/AbstractSyntaxTree";
 import { BinaryOperatorSyntaxTree } from "./AST/BinaryOperatorSyntaxTree";
 import { LiteralSyntaxTree } from "./AST/LiteralSyntaxTree";
 import { UnaryOperatorSyntaxTree } from "./AST/UnaryOperatorSyntaxTree";
+import { VariableDeclarationSyntaxTree } from "./AST/VariableDeclarationSyntaxTree";
 import { VariableSyntaxTree } from "./AST/VariableSyntaxTree";
 import Tokenizer from "./Tokenizer";
 
@@ -174,11 +175,25 @@ export default class Parser {
     return this.disjunction();
   }
 
-  private variableAssignment() : AbstractSyntaxTree {
+  private variableAssignment(): AbstractSyntaxTree {
     let root = new VariableSyntaxTree(this.tokenizer.getNextToken());
-    console.log(root.getToken().str)
     
     root = new BinaryOperatorSyntaxTree(this.tokenizer.getNextToken(), root, this.expression())
+
+    return root;
+  }
+
+  private variableDeclaration() : AbstractSyntaxTree {
+    const root = new VariableDeclarationSyntaxTree(this.tokenizer.getNextToken());
+    
+    do{
+      if(this.tokenizer.peekToken(2).type === TokenKind.ASSIGN){
+        root.addChild(this.variableAssignment());
+      }else{
+        root.addChild(new VariableSyntaxTree(this.tokenizer.getNextToken()))
+        this.tokenizer.advance();
+      }
+    }while(this.tokenizer.getCurrentToken().type === TokenKind.COMMA)
 
     return root;
   }
@@ -189,7 +204,12 @@ export default class Parser {
     if(this.tokenizer.peekToken(1).type === TokenKind.SYMBOL &&
       this.tokenizer.peekToken(2).type === TokenKind.ASSIGN){
         root = this.variableAssignment()
-    }else{
+    }
+    else if(this.tokenizer.peekToken(1).type === TokenKind.SYMBOL &&
+      this.tokenizer.peekToken(2).type === TokenKind.SYMBOL){
+        root = this.variableDeclaration()
+    }
+    else{
       root = this.expression()
     }
 
