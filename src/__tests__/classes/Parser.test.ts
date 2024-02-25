@@ -122,12 +122,30 @@ describe("Parser", () => {
   })
 
   it("should parse blocks", () => {
+    parser.setInput("{}");
+    expect(parser.program().postfix()).toBe("{\n}");
     parser.setInput(`{
       int a;
       a = a + 1;
       int bcd = a;
     }`)
     expect(parser.program().postfix()).toBe(`{\nint (a)\na a 1 + =\nint (bcd a =)\n}`);
+  })
+
+  it("should parse function definitions", () => {
+    parser.setInput(`
+    void foo(){
+      int a;
+      a = a + 1;
+      int bcd = a;
+    }`);
+    expect(parser.program().postfix()).toBe("void foo(){\nint (a)\na a 1 + =\nint (bcd a =)\n}");
+
+    parser.setInput(`int foo(int a, int b, int c){
+      return a + b + c;
+    }`);
+
+    expect(parser.program().postfix()).toBe(`int foo( int (a), int (b), int (c)){\nreturn a b + c +\n}`);
   })
 
   it("should not allow to have missing operands", () => {
@@ -153,6 +171,15 @@ describe("Parser", () => {
     parser.setInput("123 = 3;");
     expect(()=>{parser.program()}).toThrowError();
     parser.setInput("12 + 3 = 45;");
+    expect(()=>{parser.program()}).toThrowError();
+  })
+
+  it("should not allow to have function parameters definition with wrong COMMA position", () => {
+    parser.setInput("int foo(int a,){}");
+    expect(()=>{parser.program()}).toThrowError();
+    parser.setInput("int foo(int a,,){}");
+    expect(()=>{parser.program()}).toThrowError();
+    parser.setInput("int foo(int a int b){}");
     expect(()=>{parser.program()}).toThrowError();
   })
 });

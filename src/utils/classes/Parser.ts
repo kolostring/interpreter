@@ -8,8 +8,11 @@ import { TokenKind } from "../constants/tokenKinds";
 import { AbstractSyntaxTree } from "./AST/AbstractSyntaxTree";
 import { BinaryOperatorSyntaxTree } from "./AST/BinaryOperatorSyntaxTree";
 import { BlockSyntaxTree } from "./AST/BlockSyntaxTree";
+import { FunctionDefinitionSyntaxTree } from "./AST/FunctionDefinitionSyntaxTree";
+import { FunctionParametersDefinitionSyntaxTree } from "./AST/FunctionParametersDefinitionSyntaxTree";
 import { LiteralSyntaxTree } from "./AST/LiteralSyntaxTree";
 import { ProgramSyntaxTree } from "./AST/ProgramSyntaxTree";
+import { ReturnStatementSyntaxTree } from "./AST/ReturnStatementSyntaxTree";
 import { UnaryOperatorSyntaxTree } from "./AST/UnaryOperatorSyntaxTree";
 import { VariableDeclarationSyntaxTree } from "./AST/VariableDeclarationSyntaxTree";
 import { VariableSyntaxTree } from "./AST/VariableSyntaxTree";
@@ -209,6 +212,9 @@ export default class Parser {
       this.tokenizer.peekToken(1).type === TokenKind.SYMBOL){
         root = this.variableDeclaration()
     }
+    else if(this.tokenizer.peekToken(0).type === TokenKind.RETURN){
+        root = new ReturnStatementSyntaxTree(this.tokenizer.advance(), this.expression());
+    }
     else{
       root = this.expression()
     }
@@ -217,7 +223,7 @@ export default class Parser {
     return root;
   }
 
-  public block(): AbstractSyntaxTree {
+  private block(): BlockSyntaxTree {
     const root = new BlockSyntaxTree(this.tokenizer.advance());
 
     while(this.tokenizer.getCurrentToken().type !== TokenKind.R_BRACE){
@@ -234,6 +240,38 @@ export default class Parser {
     return root;
   }
 
+  private functionParameters(): FunctionParametersDefinitionSyntaxTree{
+    const root = new FunctionParametersDefinitionSyntaxTree(this.tokenizer.getCurrentToken());
+
+    this.eat(TokenKind.L_PARENTHESIS);
+
+    let parametersLeft :boolean = this.tokenizer.getCurrentToken().type !== TokenKind.R_PARENTHESIS;
+
+    while(parametersLeft){
+      const parameter = new VariableDeclarationSyntaxTree(this.tokenizer.advance());
+      parameter.addChild(new VariableSyntaxTree(this.tokenizer.advance()));
+      
+      root.addChild(parameter);
+      if(this.tokenizer.getCurrentToken().type === TokenKind.COMMA){
+        parametersLeft = true;
+        this.tokenizer.advance();
+      }else{
+        parametersLeft = false;
+      }
+    }
+
+    this.eat(TokenKind.R_PARENTHESIS);
+
+    return root;
+  }
+
+  private functionDefinition(): AbstractSyntaxTree{
+    const retType = this.tokenizer.advance();
+    const identifier = new VariableSyntaxTree(this.tokenizer.advance());
+
+    return new FunctionDefinitionSyntaxTree(retType, identifier, this.functionParameters(), this.block());
+  }
+
   public program(): AbstractSyntaxTree {
     const root = new ProgramSyntaxTree(this.tokenizer.advance());
 
@@ -242,11 +280,18 @@ export default class Parser {
       if(this.tokenizer.getCurrentToken().type === TokenKind.L_BRACE){
         root.addChild(this.block());
       }
+      else if(
+        this.tokenizer.peekToken(0).type === TokenKind.SYMBOL &&
+        this.tokenizer.peekToken(1).type === TokenKind.SYMBOL &&
+        this.tokenizer.peekToken(2).type === TokenKind.L_PARENTHESIS
+      ){
+        root.addChild(this.functionDefinition());
+      }
       else {
         root.addChild(this.sentence());
       }
     }
-    
+
     return root;
   }
 }
