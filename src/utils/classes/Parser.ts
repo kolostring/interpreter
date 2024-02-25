@@ -7,6 +7,7 @@ import {
 import { TokenKind } from "../constants/tokenKinds";
 import { AbstractSyntaxTree } from "./AST/AbstractSyntaxTree";
 import { BinaryOperatorSyntaxTree } from "./AST/BinaryOperatorSyntaxTree";
+import { BlockSyntaxTree } from "./AST/BlockSyntaxTree";
 import { LiteralSyntaxTree } from "./AST/LiteralSyntaxTree";
 import { ProgramSyntaxTree } from "./AST/ProgramSyntaxTree";
 import { UnaryOperatorSyntaxTree } from "./AST/UnaryOperatorSyntaxTree";
@@ -216,13 +217,36 @@ export default class Parser {
     return root;
   }
 
+  public block(): AbstractSyntaxTree {
+    const root = new BlockSyntaxTree(this.tokenizer.advance());
+
+    while(this.tokenizer.getCurrentToken().type !== TokenKind.R_BRACE){
+      if (this.tokenizer.getCurrentToken().type === TokenKind.EOF){
+        throw new Error(
+          `<${TokenKind[TokenKind.R_BRACE]}>:"}" expected.`
+        );
+      }
+
+      root.addChild(this.sentence());
+    }
+
+    this.tokenizer.advance();
+    return root;
+  }
+
   public program(): AbstractSyntaxTree {
     const root = new ProgramSyntaxTree(this.tokenizer.advance());
 
-    while(this.tokenizer.peekToken(0).type !== TokenKind.EOF)
+    while(this.tokenizer.getCurrentToken().type !== TokenKind.EOF)
     {
-      root.addChild(this.sentence());
+      if(this.tokenizer.getCurrentToken().type === TokenKind.L_BRACE){
+        root.addChild(this.block());
+      }
+      else {
+        root.addChild(this.sentence());
+      }
     }
+    
     return root;
   }
 }

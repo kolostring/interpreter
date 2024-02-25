@@ -121,6 +121,15 @@ describe("Parser", () => {
     expect(parser.program().postfix()).toBe("int (a 12 =)\nint (b 34 5 + =)\n6 7 *");
   })
 
+  it("should parse blocks", () => {
+    parser.setInput(`{
+      int a;
+      a = a + 1;
+      int bcd = a;
+    }`)
+    expect(parser.program().postfix()).toBe(`{\nint (a)\na a 1 + =\nint (bcd a =)\n}`);
+  })
+
   it("should not allow to have missing operands", () => {
     parser.setInput("1-;");
     expect(()=>{parser.program()}).toThrowError();
