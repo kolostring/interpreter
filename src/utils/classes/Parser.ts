@@ -8,6 +8,7 @@ import { TokenKind } from "../constants/tokenKinds";
 import { AbstractSyntaxTree } from "./AST/AbstractSyntaxTree";
 import { BinaryOperatorSyntaxTree } from "./AST/BinaryOperatorSyntaxTree";
 import { LiteralSyntaxTree } from "./AST/LiteralSyntaxTree";
+import { ProgramSyntaxTree } from "./AST/ProgramSyntaxTree";
 import { UnaryOperatorSyntaxTree } from "./AST/UnaryOperatorSyntaxTree";
 import { VariableDeclarationSyntaxTree } from "./AST/VariableDeclarationSyntaxTree";
 import { VariableSyntaxTree } from "./AST/VariableSyntaxTree";
@@ -35,8 +36,8 @@ export default class Parser {
   }
 
   private basePower(): AbstractSyntaxTree {
-    const currToken = this.tokenizer.getNextToken();
-
+    const currToken = this.tokenizer.getCurrentToken();
+    this.tokenizer.advance();
     if (
       currToken.str in unaryArithmeticOperators ||
       currToken.str in unaryLogicalOperators
@@ -48,9 +49,7 @@ export default class Parser {
       currToken.str === "true" ||
       currToken.str === "false"
     ) {
-      const root = new LiteralSyntaxTree(currToken);
-      this.tokenizer.advance();
-      return root;
+      return new LiteralSyntaxTree(currToken);
     }
     if (currToken.str === "(") {
       const root = this.expression();
@@ -58,7 +57,6 @@ export default class Parser {
       return root;
     }
     if (currToken.type === TokenKind.SYMBOL){
-      this.tokenizer.advance();
       return new VariableSyntaxTree(currToken);
     }
 
@@ -70,9 +68,12 @@ export default class Parser {
   private factor(): AbstractSyntaxTree {
     let root = this.basePower();
 
+    let currToken;
     while (this.tokenizer.getCurrentToken().str === "^") {
+      currToken = this.tokenizer.getCurrentToken();
+      this.tokenizer.advance();
       root = new BinaryOperatorSyntaxTree(
-        this.tokenizer.getCurrentToken(),
+        currToken,
         root,
         this.factor()
       );
@@ -84,12 +85,15 @@ export default class Parser {
   private term(): AbstractSyntaxTree {
     let root = this.factor();
 
+    let currToken;
     while (
       this.tokenizer.getCurrentToken().str === "*" ||
       this.tokenizer.getCurrentToken().str === "/"
     ) {
+      currToken = this.tokenizer.getCurrentToken();
+      this.tokenizer.advance();
       root = new BinaryOperatorSyntaxTree(
-        this.tokenizer.getCurrentToken(),
+        currToken,
         root,
         this.factor()
       );
@@ -100,13 +104,16 @@ export default class Parser {
 
   private arithmeitcExpression(): AbstractSyntaxTree {
     let root = this.term();
-
+    
+    let currToken;
     while (
       this.tokenizer.getCurrentToken().str === "+" ||
       this.tokenizer.getCurrentToken().str === "-"
     ) {
+      currToken = this.tokenizer.getCurrentToken();
+      this.tokenizer.advance();
       root = new BinaryOperatorSyntaxTree(
-        this.tokenizer.getCurrentToken(),
+        currToken,
         root,
         this.term()
       );
@@ -118,9 +125,12 @@ export default class Parser {
   private relation(): AbstractSyntaxTree {
     let root = this.arithmeitcExpression();
 
+    let currToken;
     if (this.tokenizer.getCurrentToken().str in relationalOperators) {
+      currToken = this.tokenizer.getCurrentToken();
+      this.tokenizer.advance();
       root = new BinaryOperatorSyntaxTree(
-        this.tokenizer.getCurrentToken(),
+        currToken,
         root,
         this.arithmeitcExpression()
       );
@@ -132,9 +142,12 @@ export default class Parser {
   private equality(): AbstractSyntaxTree {
     let root = this.relation();
 
+    let currToken;
     while (this.tokenizer.getCurrentToken().str in equalityOperators) {
+      currToken = this.tokenizer.getCurrentToken();
+      this.tokenizer.advance();
       root = new BinaryOperatorSyntaxTree(
-        this.tokenizer.getCurrentToken(),
+        currToken,
         root,
         this.relation()
       );
@@ -146,9 +159,12 @@ export default class Parser {
   private conjunction(): AbstractSyntaxTree {
     let root = this.equality();
 
+    let currToken;
     while (this.tokenizer.getCurrentToken().str === "&&") {
+      currToken = this.tokenizer.getCurrentToken();
+      this.tokenizer.advance();
       root = new BinaryOperatorSyntaxTree(
-        this.tokenizer.getCurrentToken(),
+        currToken,
         root,
         this.equality()
       );
@@ -160,9 +176,12 @@ export default class Parser {
   private disjunction(): AbstractSyntaxTree {
     let root = this.conjunction();
 
+    let currToken;
     while (this.tokenizer.getCurrentToken().str === "||") {
+      currToken = this.tokenizer.getCurrentToken();
+      this.tokenizer.advance();
       root = new BinaryOperatorSyntaxTree(
-        this.tokenizer.getCurrentToken(),
+        currToken,
         root,
         this.conjunction()
       );
@@ -176,18 +195,21 @@ export default class Parser {
   }
 
   private variableAssignment(): AbstractSyntaxTree {
-    let root = new VariableSyntaxTree(this.tokenizer.getNextToken());
+    let root = new VariableSyntaxTree(this.tokenizer.getCurrentToken());
     
-    root = new BinaryOperatorSyntaxTree(this.tokenizer.getNextToken(), root, this.expression())
+    let currToken = this.tokenizer.getNextToken();
+    this.tokenizer.advance();
+    root = new BinaryOperatorSyntaxTree(currToken, root, this.expression())
 
     return root;
   }
 
   private variableDeclaration() : AbstractSyntaxTree {
-    const root = new VariableDeclarationSyntaxTree(this.tokenizer.getNextToken());
-    
+    const root = new VariableDeclarationSyntaxTree(this.tokenizer.getCurrentToken());
+
     do{
       if(this.tokenizer.peekToken(2).type === TokenKind.ASSIGN){
+        this.tokenizer.advance();
         root.addChild(this.variableAssignment());
       }else{
         root.addChild(new VariableSyntaxTree(this.tokenizer.getNextToken()))
@@ -198,15 +220,15 @@ export default class Parser {
     return root;
   }
 
-  public sentence(): AbstractSyntaxTree {
+  private sentence(): AbstractSyntaxTree {
     let root;
 
-    if(this.tokenizer.peekToken(1).type === TokenKind.SYMBOL &&
-      this.tokenizer.peekToken(2).type === TokenKind.ASSIGN){
+    if(this.tokenizer.peekToken(0).type === TokenKind.SYMBOL &&
+      this.tokenizer.peekToken(1).type === TokenKind.ASSIGN){
         root = this.variableAssignment()
     }
-    else if(this.tokenizer.peekToken(1).type === TokenKind.SYMBOL &&
-      this.tokenizer.peekToken(2).type === TokenKind.SYMBOL){
+    else if(this.tokenizer.peekToken(0).type === TokenKind.SYMBOL &&
+      this.tokenizer.peekToken(1).type === TokenKind.SYMBOL){
         root = this.variableDeclaration()
     }
     else{
@@ -214,6 +236,16 @@ export default class Parser {
     }
 
     this.eat(TokenKind.SEMI);
+    return root;
+  }
+
+  public program(): AbstractSyntaxTree {
+    const root = new ProgramSyntaxTree(this.tokenizer.getCurrentToken());
+    this.tokenizer.advance();
+    while(this.tokenizer.peekToken(0).type !== TokenKind.EOF)
+    {
+      root.addChild(this.sentence());
+    }
     return root;
   }
 }
