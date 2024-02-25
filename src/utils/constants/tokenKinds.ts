@@ -28,4 +28,5 @@ export enum TokenKind {
   TRUE,
   FALSE,
   NUMBER,
+  RETURN,
 }

@@ -111,6 +111,9 @@ export default class Tokenizer {
     else if(str === "false"){
       this.setCurrentToken(str, TokenKind.FALSE)
     }
+    else if(str === "return"){
+      this.setCurrentToken(str, TokenKind.RETURN)
+    }
     else{
       this.setCurrentToken(str, TokenKind.SYMBOL);
     }
