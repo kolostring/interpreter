@@ -49,9 +49,9 @@ export default class Parser {
       return new UnaryOperatorSyntaxTree(currToken, this.basePower());
     }
     if (
-      !isNaN(Number(currToken.str)) ||
-      currToken.str === "true" ||
-      currToken.str === "false"
+      currToken.type === TokenKind.NUMBER ||
+      currToken.type === TokenKind.TRUE ||
+      currToken.type === TokenKind.FALSE
     ) {
       return new LiteralSyntaxTree(currToken);
     }
@@ -72,7 +72,7 @@ export default class Parser {
   private factor(): AbstractSyntaxTree {
     let root = this.basePower();
 
-    while (this.tokenizer.getCurrentToken().str === "^") {
+    while (this.tokenizer.getCurrentToken().type === TokenKind.POWER) {
       root = new BinaryOperatorSyntaxTree(
         this.tokenizer.advance(),
         root,
@@ -87,8 +87,8 @@ export default class Parser {
     let root = this.factor();
 
     while (
-      this.tokenizer.getCurrentToken().str === "*" ||
-      this.tokenizer.getCurrentToken().str === "/"
+      this.tokenizer.getCurrentToken().type === TokenKind.MUL ||
+      this.tokenizer.getCurrentToken().type === TokenKind.DIV
     ) {
       root = new BinaryOperatorSyntaxTree(
         this.tokenizer.advance(),
@@ -104,8 +104,8 @@ export default class Parser {
     let root = this.term();
     
     while (
-      this.tokenizer.getCurrentToken().str === "+" ||
-      this.tokenizer.getCurrentToken().str === "-"
+      this.tokenizer.getCurrentToken().type === TokenKind.PLUS ||
+      this.tokenizer.getCurrentToken().type === TokenKind.MINUS
     ) {
       root = new BinaryOperatorSyntaxTree(
         this.tokenizer.advance(),
@@ -148,7 +148,7 @@ export default class Parser {
   private conjunction(): AbstractSyntaxTree {
     let root = this.equality();
 
-    while (this.tokenizer.getCurrentToken().str === "&&") {
+    while (this.tokenizer.getCurrentToken().type === TokenKind.AND) {
       root = new BinaryOperatorSyntaxTree(
         this.tokenizer.advance(),
         root,
@@ -162,7 +162,7 @@ export default class Parser {
   private disjunction(): AbstractSyntaxTree {
     let root = this.conjunction();
 
-    while (this.tokenizer.getCurrentToken().str === "||") {
+    while (this.tokenizer.getCurrentToken().type === TokenKind.OR) {
       root = new BinaryOperatorSyntaxTree(
         this.tokenizer.advance(),
         root,
