@@ -67,7 +67,7 @@ export default class Tokenizer {
     }
   }
 
-  private getOperator(): string {
+  private setOperatorToken(): void {
     let str = "";
 
     do {
@@ -79,32 +79,11 @@ export default class Tokenizer {
       str + this.getCurrentChar() in operators
     );
 
-    return str;
+    this.setCurrentToken(str, operators[str].tokenID);
   }
 
-  public advance(): void {
+  private getWord(): string {
     let str = "";
-
-    if (this.ptr >= this.input.length) {
-      this.currentToken = {
-        str: "\0",
-        type: TokenKind.EOF,
-        pos: this.ptr,
-        row: this.row,
-        col: this.col,
-      };
-      return;
-    }
-
-    if (this.getCurrentChar() === " " || this.getCurrentChar() === "\n") {
-      this.skipWhiteSpaces();
-    }
-
-    if (this.getCurrentChar() in operators) {
-      str = this.getOperator();
-      this.setCurrentToken(str, operators[str].tokenID);
-      return;
-    }
 
     do {
       str += this.getCurrentChar();
@@ -116,6 +95,12 @@ export default class Tokenizer {
       this.getCurrentChar() !== "\n" &&
       !(this.getCurrentChar() in operators)
     );
+
+    return str;
+  }
+
+  private setLiteralOrSymbolToken(): void {
+    const str = this.getWord();
 
     if(!isNaN(Number(str))){
       this.setCurrentToken(str, TokenKind.NUMBER)
@@ -129,6 +114,33 @@ export default class Tokenizer {
     else{
       this.setCurrentToken(str, TokenKind.SYMBOL);
     }
+  }
+
+  public advance(): Token {
+    let lastToken = this.currentToken;
+
+    if (this.ptr >= this.input.length) {
+      this.currentToken = {
+        str: "\0",
+        type: TokenKind.EOF,
+        pos: this.ptr,
+        row: this.row,
+        col: this.col,
+      };
+    }
+    else{
+      if (this.getCurrentChar() === " " || this.getCurrentChar() === "\n") {
+        this.skipWhiteSpaces();
+      }
+
+      if (this.getCurrentChar() in operators) {
+        this.setOperatorToken();
+      }else{
+        this.setLiteralOrSymbolToken();
+      }
+    }
+
+    return lastToken
   }
 
   public getCurrentPosition() {
