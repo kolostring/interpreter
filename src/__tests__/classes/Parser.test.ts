@@ -132,6 +132,19 @@ describe("Parser", () => {
     expect(parser.program().postfix()).toBe(`{\nint (a)\na a 1 + =\nint (bcd a =)\n}`);
   })
 
+  it("should parse function calls", () => {
+    parser.setInput("foo();");
+    expect(parser.program().postfix()).toBe("foo()");
+    parser.setInput("foo(a);");
+    expect(parser.program().postfix()).toBe("foo( (a) )");
+    parser.setInput("foo(a,b);");
+    expect(parser.program().postfix()).toBe("foo( (a) , (b) )");
+    parser.setInput("foo(a+b*c, 32**4);");
+    expect(parser.program().postfix()).toBe("foo( (a b c * +) , (32 4 **) )");
+    parser.setInput("foo(foo());");
+    expect(parser.program().postfix()).toBe("foo( (foo()) )");
+  })
+
   it("should parse function definitions", () => {
     parser.setInput(`
     void foo(){

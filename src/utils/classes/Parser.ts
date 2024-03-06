@@ -8,6 +8,7 @@ import { TokenKind } from "../constants/tokenKinds";
 import { AbstractSyntaxTree } from "./AST/AbstractSyntaxTree";
 import { BinaryOperatorSyntaxTree } from "./AST/BinaryOperatorSyntaxTree";
 import { BlockSyntaxTree } from "./AST/BlockSyntaxTree";
+import { FunctionCallSyntaxTree } from "./AST/FunctionCallSyntaxTree";
 import { FunctionDefinitionSyntaxTree } from "./AST/FunctionDefinitionSyntaxTree";
 import { FunctionParametersDefinitionSyntaxTree } from "./AST/FunctionParametersDefinitionSyntaxTree";
 import { LiteralSyntaxTree } from "./AST/LiteralSyntaxTree";
@@ -41,11 +42,12 @@ export default class Parser {
 
   private basePower(): AbstractSyntaxTree {
     const currToken = this.tokenizer.getCurrentToken();
-    this.tokenizer.advance();
+    
     if (
       currToken.str in unaryArithmeticOperators ||
       currToken.str in unaryLogicalOperators
     ) {
+      this.tokenizer.advance();
       return new UnaryOperatorSyntaxTree(currToken, this.basePower());
     }
     if (
@@ -53,15 +55,22 @@ export default class Parser {
       currToken.type === TokenKind.TRUE ||
       currToken.type === TokenKind.FALSE
     ) {
+      this.tokenizer.advance();
       return new LiteralSyntaxTree(currToken);
     }
     if (currToken.str === "(") {
+      this.tokenizer.advance();
       const root = this.expression();
       this.eat(TokenKind.R_PARENTHESIS);
       return root;
     }
     if (currToken.type === TokenKind.SYMBOL){
-      return new VariableSyntaxTree(currToken);
+      if(this.tokenizer.peekToken(1).type === TokenKind.L_PARENTHESIS){
+        return this.functionCall();
+      }else{
+        this.tokenizer.advance();
+        return new VariableSyntaxTree(currToken);
+      }
     }
 
     throw new Error(
@@ -270,6 +279,30 @@ export default class Parser {
     const identifier = new VariableSyntaxTree(this.tokenizer.advance());
 
     return new FunctionDefinitionSyntaxTree(retType, identifier, this.functionParameters(), this.block());
+  }
+
+  private functionCall() : AbstractSyntaxTree {
+    console.log("Enter Function Call");
+    const root = new FunctionCallSyntaxTree(this.tokenizer.advance());
+
+    this.eat(TokenKind.L_PARENTHESIS);
+
+    let parametersLeft :boolean = this.tokenizer.getCurrentToken().type !== TokenKind.R_PARENTHESIS;
+
+    while(parametersLeft){
+      root.addChild(this.expression());
+
+      if(this.tokenizer.getCurrentToken().type === TokenKind.COMMA){
+        parametersLeft = true;
+        this.tokenizer.advance();
+      }else{
+        parametersLeft = false;
+      }
+    }
+
+    this.eat(TokenKind.R_PARENTHESIS);
+
+    return root;
   }
 
   public program(): AbstractSyntaxTree {
