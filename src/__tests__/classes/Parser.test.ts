@@ -49,26 +49,26 @@ describe("Parser", () => {
   });
 
   it("should parse power operators with right associativity", () => {
-    parser.setInput("1^2^3;");
-    expect(parser.program().postfix()).toBe("1 2 3 ^ ^");
-    parser.setInput("1^(2*3)^(4*5);");
-    expect(parser.program().postfix()).toBe("1 2 3 * 4 5 * ^ ^");
-    parser.setInput("1^(2*3^2^2^2)^(4*5);");
-    expect(parser.program().postfix()).toBe("1 2 3 2 2 2 ^ ^ ^ * 4 5 * ^ ^");
+    parser.setInput("1**2**3;");
+    expect(parser.program().postfix()).toBe("1 2 3 ** **");
+    parser.setInput("1**(2*3)**(4*5);");
+    expect(parser.program().postfix()).toBe("1 2 3 * 4 5 * ** **");
+    parser.setInput("1**(2*3**2**2**2)**(4*5);");
+    expect(parser.program().postfix()).toBe("1 2 3 2 2 2 ** ** ** * 4 5 * ** **");
   });
 
   it("should parse Relational Operations", () => {
     parser.setInput("12+3<45;");
     expect(parser.program().postfix()).toBe("12 3 + 45 <");
-    parser.setInput("12+3 >=(45^6);");
-    expect(parser.program().postfix()).toBe("12 3 + 45 6 ^ >=");
+    parser.setInput("12+3 >=(45**6);");
+    expect(parser.program().postfix()).toBe("12 3 + 45 6 ** >=");
   });
 
   it("should parse Equality Operations", () => {
     parser.setInput("123 == 3;");
     expect(parser.program().postfix()).toBe("123 3 ==");
-    parser.setInput("12+3 != (45^6);");
-    expect(parser.program().postfix()).toBe("12 3 + 45 6 ^ !=");
+    parser.setInput("12+3 != (45**6);");
+    expect(parser.program().postfix()).toBe("12 3 + 45 6 ** !=");
     parser.setInput("1 == 2 != 4;");
     expect(parser.program().postfix()).toBe("1 2 == 4 !=");
     parser.setInput("1 == (2 != 30);");
@@ -151,7 +151,7 @@ describe("Parser", () => {
   it("should not allow to have missing operands", () => {
     parser.setInput("1-;");
     expect(()=>{parser.program()}).toThrowError();
-    parser.setInput("1*2**3;");
+    parser.setInput("1*2//3;");
     expect(()=>{parser.program()}).toThrowError();
   });
 
