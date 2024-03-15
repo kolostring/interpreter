@@ -1,10 +1,4 @@
-import {
-  equalityOperators,
-  relationalOperators,
-  unaryArithmeticOperators,
-  unaryLogicalOperators,
-} from "../constants/operators";
-import { TokenKind } from "../constants/tokenKinds";
+import { TokenKind, isTokenEqualityOperator, isTokenLiteral, isTokenRelationalOperator, isTokenUnaryOperator } from "../constants/tokenKinds";
 import { AbstractSyntaxTree } from "./AST/AbstractSyntaxTree";
 import { BinaryOperatorSyntaxTree } from "./AST/BinaryOperatorSyntaxTree";
 import { BlockSyntaxTree } from "./AST/BlockSyntaxTree";
@@ -43,22 +37,15 @@ export default class Parser {
   private basePower(): AbstractSyntaxTree {
     const currToken = this.tokenizer.getCurrentToken();
     
-    if (
-      currToken.str in unaryArithmeticOperators ||
-      currToken.str in unaryLogicalOperators
-    ) {
+    if (isTokenUnaryOperator(currToken.type)) {
       this.tokenizer.advance();
       return new UnaryOperatorSyntaxTree(currToken, this.basePower());
     }
-    if (
-      currToken.type === TokenKind.NUMBER ||
-      currToken.type === TokenKind.TRUE ||
-      currToken.type === TokenKind.FALSE
-    ) {
+    if (isTokenLiteral(currToken.type)) {
       this.tokenizer.advance();
       return new LiteralSyntaxTree(currToken);
     }
-    if (currToken.str === "(") {
+    if (currToken.type === TokenKind.L_PARENTHESIS) {
       this.tokenizer.advance();
       const root = this.expression();
       this.eat(TokenKind.R_PARENTHESIS);
@@ -129,7 +116,7 @@ export default class Parser {
   private relation(): AbstractSyntaxTree {
     let root = this.arithmeitcExpression();
 
-    if (this.tokenizer.getCurrentToken().str in relationalOperators) {
+    if (isTokenRelationalOperator(this.tokenizer.getCurrentToken().type)) {
       root = new BinaryOperatorSyntaxTree(
         this.tokenizer.advance(),
         root,
@@ -143,7 +130,7 @@ export default class Parser {
   private equality(): AbstractSyntaxTree {
     let root = this.relation();
 
-    while (this.tokenizer.getCurrentToken().str in equalityOperators) {
+    while (isTokenEqualityOperator(this.tokenizer.getCurrentToken().type)) {
       root = new BinaryOperatorSyntaxTree(
         this.tokenizer.advance(),
         root,

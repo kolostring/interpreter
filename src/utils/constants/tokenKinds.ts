@@ -30,3 +30,19 @@ export enum TokenKind {
   NUMBER,
   RETURN,
 }
+
+export function isTokenLiteral(tokenKind: TokenKind){
+  return tokenKind === TokenKind.NUMBER || tokenKind === TokenKind.FALSE || tokenKind === TokenKind.TRUE;
+}
+
+export function isTokenUnaryOperator(tokenKind: TokenKind){
+  return tokenKind === TokenKind.PLUS || tokenKind === TokenKind.MINUS || tokenKind === TokenKind.NOT;
+}
+
+export function isTokenRelationalOperator(tokenKind: TokenKind){
+  return tokenKind === TokenKind.GREATER_THAN || tokenKind === TokenKind.GREATER_OR_EQUAL_THAN || tokenKind === TokenKind.LESS_THAN || tokenKind === TokenKind.LESS_OR_EQUAL_THAN;
+}
+
+export function isTokenEqualityOperator(tokenKind: TokenKind){
+  return tokenKind === TokenKind.EQUAL || tokenKind === TokenKind.DIFFERENT;
+}
