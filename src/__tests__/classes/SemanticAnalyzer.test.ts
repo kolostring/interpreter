@@ -11,4 +11,38 @@ describe("Semantic Analyzer", ()=>{
     parser.setInput("real a; bool a;");
     expect(()=>semanticAnalyzer.analyze(parser.program() as ProgramSyntaxTree)).toThrowError();
   })
+
+  it("should allow to relate arithmetic operations", ()=>{
+    parser.setInput("(1+2+3) > (45*(90**2));");
+    semanticAnalyzer.analyze(parser.program() as ProgramSyntaxTree);
+  });
+
+  it("should allow equality operations", ()=>{
+    parser.setInput("(1+2+3) == (45);");
+    semanticAnalyzer.analyze(parser.program() as ProgramSyntaxTree);
+    
+    parser.setInput("!(1+2+3 > 4) == (56 == 78);");
+    semanticAnalyzer.analyze(parser.program() as ProgramSyntaxTree);
+  });
+
+  it("should not allow arithmetic operators to operate over any type other than real", ()=>{
+    parser.setInput("123+true;");
+    expect(()=>semanticAnalyzer.analyze(parser.program() as ProgramSyntaxTree)).toThrowError();
+  });
+
+  it("should not allow relational operators to operate over any type other than real", () => {
+    parser.setInput("true > 123;");
+    expect(()=>semanticAnalyzer.analyze(parser.program() as ProgramSyntaxTree)).toThrowError();
+  });
+
+  it("should not allow not operator to operate over any type other than bool", () => {
+    parser.setInput("!123;");
+    expect(()=>semanticAnalyzer.analyze(parser.program() as ProgramSyntaxTree)).toThrowError();
+  });
+
+  it("should not allow equality operators to operate over different types", () => {
+    parser.setInput("false == 123;");
+    expect(()=>semanticAnalyzer.analyze(parser.program() as ProgramSyntaxTree)).toThrowError();
+  });
+  
 })
