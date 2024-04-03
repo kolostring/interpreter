@@ -39,6 +39,10 @@ export function isTokenUnaryOperator(tokenKind: TokenKind){
   return tokenKind === TokenKind.PLUS || tokenKind === TokenKind.MINUS || tokenKind === TokenKind.NOT;
 }
 
+export function isTokenArithmeticOperator(tokenKind: TokenKind){
+  return tokenKind === TokenKind.PLUS || tokenKind === TokenKind.MINUS || tokenKind === TokenKind.DIV || tokenKind === TokenKind.MUL || tokenKind === TokenKind.POWER;
+}
+
 export function isTokenRelationalOperator(tokenKind: TokenKind){
   return tokenKind === TokenKind.GREATER_THAN || tokenKind === TokenKind.GREATER_OR_EQUAL_THAN || tokenKind === TokenKind.LESS_THAN || tokenKind === TokenKind.LESS_OR_EQUAL_THAN;
 }
