@@ -8,7 +8,10 @@ const parser = new Parser();
 
 describe("Semantic Analyzer", ()=>{
   it("should not allow to redefine a symbol", ()=>{
-    parser.setInput("real a; bool a;");
+    parser.setInput(`real a;\nbool a;`);
+    expect(()=>semanticAnalyzer.analyze(parser.program() as ProgramSyntaxTree)).toThrowError();
+
+    parser.setInput(`real a, b = 32, a, c, d;`);
     expect(()=>semanticAnalyzer.analyze(parser.program() as ProgramSyntaxTree)).toThrowError();
   })
 

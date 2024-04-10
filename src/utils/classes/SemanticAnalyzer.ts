@@ -88,12 +88,23 @@ export default class SemanticAnalyzer{
     
   }
 
-  private analyzeVariableDeclaration(varDeclST: VariableDeclarationSyntaxTree){
-    const varSymbol = {scope: this.currentScope, ast: varDeclST};
-    this.symbolTable.addSymbol(varSymbol);
+  public analyzeVariableDeclaration (varDeclST: VariableDeclarationSyntaxTree): void {
+    const type = varDeclST.getToken().str;
+    varDeclST.getChildren()
+    .forEach((child)=>{
+      let name = child!.getToken().str;
+
+      if(child instanceof BinaryOperatorSyntaxTree){
+        name = child.getChildren()[0]!.getToken().str;
+      }
+      
+      this.symbolTable.addSymbol(name, type, child!, this.currentScope);
+    });
   }
 
   public analyze(program :ProgramSyntaxTree): void{
+    this.symbolTable.removeSymbolsOfScope(0);
+
     program.getChildren().forEach((child)=>{
       if(child instanceof VariableDeclarationSyntaxTree){
         this.analyzeVariableDeclaration(child);
