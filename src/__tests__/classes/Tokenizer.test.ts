@@ -67,6 +67,7 @@ describe("Tokenizer", () => {
 
   it("should return correct row and column", ()=>{
     tokenizer.setInput(`hello, world!\n123 + 4-3!=20`);
+    tokenizer.peekToken(8);
 
     [[0,0,0],[5,5,0],[7,7,0],[12,12,0],[14,0,1],[18,4,1],[20,6,1],[21,7,1],[22,8,1],[23,9,1],[25,11,1]].forEach(([pos, col, row])=>{
       tokenizer.advance();

@@ -120,7 +120,7 @@ export default class Tokenizer {
   }
 
   public advance(): Token {
-    let lastToken = this.currentToken;
+    const lastToken = this.currentToken;
 
     if (this.ptr >= this.input.length) {
       this.currentToken = {
@@ -155,19 +155,21 @@ export default class Tokenizer {
   }
 
   public peekToken(nToken: number): Token {
-    const currToken = this.currentToken
-    const currPtr = this.ptr
+    const currToken = this.currentToken;
+    const currPtr = this.ptr;
+    const currCol = this.col;
 
     while(--nToken >= 0){
       this.advance();
     }
 
-    const peekedToken = this.currentToken
+    const peekedToken = this.currentToken;
 
-    this.currentToken = currToken
-    this.ptr = currPtr
+    this.currentToken = currToken;
+    this.ptr = currPtr;
+    this.col = currCol;
 
-    return peekedToken
+    return peekedToken;
   }
 
   public getNextToken() {
