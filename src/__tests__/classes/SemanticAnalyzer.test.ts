@@ -7,14 +7,6 @@ const semanticAnalyzer = new SemanticAnalyzer();
 const parser = new Parser();
 
 describe("Semantic Analyzer", ()=>{
-  it("should not allow to redefine a symbol", ()=>{
-    parser.setInput(`real a;\nbool a;`);
-    expect(()=>semanticAnalyzer.analyze(parser.program() as ProgramSyntaxTree)).toThrowError();
-
-    parser.setInput(`real a, b = 32, a, c, d;`);
-    expect(()=>semanticAnalyzer.analyze(parser.program() as ProgramSyntaxTree)).toThrowError();
-  })
-
   it("should allow to relate arithmetic operations", ()=>{
     parser.setInput("(1+2+3) > (45*(90**2));");
     semanticAnalyzer.analyze(parser.program() as ProgramSyntaxTree);
@@ -48,4 +40,27 @@ describe("Semantic Analyzer", ()=>{
     expect(()=>semanticAnalyzer.analyze(parser.program() as ProgramSyntaxTree)).toThrowError();
   });
   
+  it("should assign values to a symbol", () => {
+    parser.setInput("bool a = (123 * 56 > 78);");
+    semanticAnalyzer.analyze(parser.program() as ProgramSyntaxTree);
+
+    parser.setInput("real a; a = 123**45;");
+    semanticAnalyzer.analyze(parser.program() as ProgramSyntaxTree);
+  })
+
+  it("should not allow to redefine a symbol", () => {
+    parser.setInput("real a;\nbool a;");
+    expect(()=>semanticAnalyzer.analyze(parser.program() as ProgramSyntaxTree)).toThrowError();
+
+    parser.setInput("real a, b = 32, a, c, d;");
+    expect(()=>semanticAnalyzer.analyze(parser.program() as ProgramSyntaxTree)).toThrowError();
+  })
+
+  it("should not allow to assign wrong type to a symbol", () => {
+    parser.setInput("real a = true");
+    expect(()=>semanticAnalyzer.analyze(parser.program() as ProgramSyntaxTree)).toThrowError();
+
+    parser.setInput("bool a; a = 123 / 45 ** 67");
+    expect(()=>semanticAnalyzer.analyze(parser.program() as ProgramSyntaxTree)).toThrowError();
+  })
 })

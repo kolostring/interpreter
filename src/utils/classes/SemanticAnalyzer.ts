@@ -26,7 +26,7 @@ export default class SemanticAnalyzer{
   public getSymbolType(ast :AbstractSyntaxTree) :string{
     const symbol = this.symbolTable.findSymbolByName(ast.getToken().str);
     if(symbol !== undefined){
-      return symbol.ast.getToken().str;
+      return symbol.type;
     }
 
     throw new Error(`Symbol "${ast.getChildren()[0]?.getToken().str}" is undefined`);
@@ -88,7 +88,15 @@ export default class SemanticAnalyzer{
     
   }
 
-  public analyzeVariableDeclaration (varDeclST: VariableDeclarationSyntaxTree): void {
+  private analyzeVariableAssigment(varAssign: BinaryOperatorSyntaxTree, type: string): void{
+    const expressionType = this.getExpressionType(varAssign.getChildren()[1]!);
+    if(expressionType !== type){
+      const varToken = varAssign.getChildren()[0]!.getToken();
+      throw new Error(`Type missmatch on assignment of variable "${varToken.str}" at row: ${varToken.row} col: ${varToken.col}. Expected <${type}>, got <${expressionType}>`);
+    }
+  }
+
+  private analyzeVariableDeclaration (varDeclST: VariableDeclarationSyntaxTree): void {
     const type = varDeclST.getToken().str;
     varDeclST.getChildren()
     .forEach((child)=>{
@@ -96,6 +104,7 @@ export default class SemanticAnalyzer{
 
       if(child instanceof BinaryOperatorSyntaxTree){
         name = child.getChildren()[0]!.getToken().str;
+        this.analyzeVariableAssigment(child, type);
       }
       
       this.symbolTable.addSymbol(name, type, child!, this.currentScope);
@@ -109,7 +118,12 @@ export default class SemanticAnalyzer{
       if(child instanceof VariableDeclarationSyntaxTree){
         this.analyzeVariableDeclaration(child);
       }
-      if(child instanceof BinaryOperatorSyntaxTree || child instanceof UnaryOperatorSyntaxTree){
+      else if(child!.getToken().type === TokenKind.ASSIGN){
+        const variable = child!.getChildren()[0]!;
+        
+        this.analyzeVariableAssigment(child as BinaryOperatorSyntaxTree, this.getSymbolType(variable));
+      }
+      else if(child instanceof BinaryOperatorSyntaxTree || child instanceof UnaryOperatorSyntaxTree){
         this.getExpressionType(child);
       }
     })
