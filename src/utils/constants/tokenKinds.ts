@@ -50,3 +50,7 @@ export function isTokenRelationalOperator(tokenKind: TokenKind){
 export function isTokenEqualityOperator(tokenKind: TokenKind){
   return tokenKind === TokenKind.EQUAL || tokenKind === TokenKind.DIFFERENT;
 }
+
+export function isTokenLogicalOperator(tokenKind: TokenKind){
+  return tokenKind === TokenKind.NOT || tokenKind === TokenKind.AND || tokenKind === TokenKind.OR
+}

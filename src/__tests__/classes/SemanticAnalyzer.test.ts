@@ -40,11 +40,14 @@ describe("Semantic Analyzer", ()=>{
     expect(()=>semanticAnalyzer.analyze(parser.program() as ProgramSyntaxTree)).toThrowError();
   });
   
-  it("should assign values to a symbol", () => {
+  it("should allow to assign values to a symbol", () => {
     parser.setInput("bool a = (123 * 56 > 78);");
     semanticAnalyzer.analyze(parser.program() as ProgramSyntaxTree);
 
     parser.setInput("real a; a = 123**45;");
+    semanticAnalyzer.analyze(parser.program() as ProgramSyntaxTree);
+
+    parser.setInput("bool a; a = 123 / 4 < 5 && 67 > 90 == false;");
     semanticAnalyzer.analyze(parser.program() as ProgramSyntaxTree);
   })
 

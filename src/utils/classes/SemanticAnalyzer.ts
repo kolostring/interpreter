@@ -1,4 +1,4 @@
-import { TokenKind, isTokenArithmeticOperator, isTokenEqualityOperator, isTokenLiteral, isTokenRelationalOperator } from "../constants/tokenKinds";
+import { TokenKind, isTokenArithmeticOperator, isTokenEqualityOperator, isTokenLiteral, isTokenLogicalOperator, isTokenRelationalOperator } from "../constants/tokenKinds";
 import { AbstractSyntaxTree } from "./AST/AbstractSyntaxTree";
 import { BinaryOperatorSyntaxTree } from "./AST/BinaryOperatorSyntaxTree";
 import { LiteralSyntaxTree } from "./AST/LiteralSyntaxTree";
@@ -32,13 +32,6 @@ export default class SemanticAnalyzer{
     throw new Error(`Symbol "${ast.getChildren()[0]?.getToken().str}" is undefined`);
   }
 
-  public validateArithmeticOperationType(ast :AbstractSyntaxTree) :string{
-    const isValid = ast.getChildren().every((child)=>child !== null && this.getExpressionType(child) === "real");
-    if(isValid) return "real";
-
-    throw new Error(`Operator <${TokenKind[ast.getToken().type]}:"${ast.getToken().str}"> at row:${ast.getToken().row} col:${ast.getToken().col} cannot operate over other types than "real"`);
-  }
-
   public validateEqualityOperationType(ast :AbstractSyntaxTree) :string{
     const leftChild = ast.getChildren()[0];
     const rightChild = ast.getChildren()[1];
@@ -48,34 +41,30 @@ export default class SemanticAnalyzer{
     throw new Error(`Operator <${TokenKind[ast.getToken().type]}:"${ast.getToken().str}"> at row:${ast.getToken().row} col:${ast.getToken().col} cannot operate over different types`);
   }
 
-  public validateNotOperatorType(ast :AbstractSyntaxTree) :string{
-    const child = ast.getChildren()[0];
-    
-    if(this.getExpressionType(child!) === "bool") return "bool";
+  public validateOperation(ast: AbstractSyntaxTree, childrenTypes: string[], returnType: string) :string{
+    const isValid = ast.getChildren().every((child)=>{
+      const expType = this.getExpressionType(child!);
+      return childrenTypes.some((type) => type === expType);
+    })
 
-    throw new Error(`Operator <${TokenKind[ast.getToken().type]}:"${ast.getToken().str}"> at row:${ast.getToken().row} col:${ast.getToken().col} cannot operate over other types than "bool"`);
-  }
+    if(isValid) return returnType;
 
-  public validateRelationalOperationType(ast :AbstractSyntaxTree) :string{
-    const isValid = ast.getChildren().every((child)=>child !== null && this.getExpressionType(child) === "real");
-    if(isValid) return "bool";
-
-    throw new Error(`Operator <${TokenKind[ast.getToken().type]}:"${ast.getToken().str}"> at row:${ast.getToken().row} col:${ast.getToken().col} cannot operate over other types than "real"`);
+    throw new Error(`Operator <${TokenKind[ast.getToken().type]}:"${ast.getToken().str}"> at row:${ast.getToken().row} col:${ast.getToken().col} cannot operate over other types than ${childrenTypes.reduce((str, type) => str + "<" + type + "> " )}`);
   }
 
   private getExpressionType(ast :AbstractSyntaxTree) :string{
     const astKind = ast.getToken().type
     if(isTokenArithmeticOperator(astKind)){
-      return this.validateArithmeticOperationType(ast);
+      return this.validateOperation(ast, ["real"], "real");
     }
     if(isTokenEqualityOperator(astKind)){
       return this.validateEqualityOperationType(ast);
     }
     if(isTokenRelationalOperator(astKind)){
-      return this.validateRelationalOperationType(ast);
+      return this.validateOperation(ast, ["real"], "bool");
     }
-    if(astKind === TokenKind.NOT){
-      return this.validateNotOperatorType(ast);
+    if(isTokenLogicalOperator(astKind)){
+      return this.validateOperation(ast, ["bool"], "bool");
     }
     if(isTokenLiteral(astKind)){
       return this.getLiteralType(ast);
