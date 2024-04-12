@@ -17,7 +17,7 @@ export default class SymbolTable {
   public addSymbol(name: string, type: string, ast: AbstractSyntaxTree, scope: number){
     const foundSymbol = this.findSymbolByName(name);
       if(foundSymbol === undefined || foundSymbol.scope !== scope){
-        this.symbols.push({name:name, scope: scope, type: type, ast: ast});
+        this.symbols.unshift({name:name, scope: scope, type: type, ast: ast});
       }else{
         throw new Error(`Redefinition of Symbol: "${foundSymbol.name}".\nInitial Definition at row: ${foundSymbol.ast.getToken().row}, col: ${foundSymbol.ast.getToken().col}\nRedefinition at row: ${ast.getToken().row}, col: ${ast.getToken().col}`);
       }
