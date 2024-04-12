@@ -1,6 +1,7 @@
 import { TokenKind, isTokenArithmeticOperator, isTokenEqualityOperator, isTokenLiteral, isTokenLogicalOperator, isTokenRelationalOperator } from "../constants/tokenKinds";
 import { AbstractSyntaxTree } from "./AST/AbstractSyntaxTree";
 import { BinaryOperatorSyntaxTree } from "./AST/BinaryOperatorSyntaxTree";
+import { BlockSyntaxTree } from "./AST/BlockSyntaxTree";
 import { LiteralSyntaxTree } from "./AST/LiteralSyntaxTree";
 import { ProgramSyntaxTree } from "./AST/ProgramSyntaxTree";
 import { UnaryOperatorSyntaxTree } from "./AST/UnaryOperatorSyntaxTree";
@@ -100,10 +101,8 @@ export default class SemanticAnalyzer{
     });
   }
 
-  public analyze(program :ProgramSyntaxTree): void{
-    this.symbolTable.removeSymbolsOfScope(0);
-
-    program.getChildren().forEach((child)=>{
+  private analyzeChildren(ast :AbstractSyntaxTree): void{
+    ast.getChildren().forEach((child)=>{
       if(child instanceof VariableDeclarationSyntaxTree){
         this.analyzeVariableDeclaration(child);
       }
@@ -115,6 +114,18 @@ export default class SemanticAnalyzer{
       else if(child instanceof BinaryOperatorSyntaxTree || child instanceof UnaryOperatorSyntaxTree){
         this.getExpressionType(child);
       }
+      else if(child instanceof BlockSyntaxTree){
+        this.currentScope++;
+        this.analyzeChildren(child);
+        this.symbolTable.removeSymbolsOfScope(this.currentScope);
+        this.currentScope--;
+      }
     })
+  }
+
+  public analyze(program :ProgramSyntaxTree): void{
+    this.symbolTable.removeSymbolsOfScope(0);
+
+    this.analyzeChildren(program);
   }
 }

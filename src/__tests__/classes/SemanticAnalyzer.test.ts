@@ -51,7 +51,15 @@ describe("Semantic Analyzer", ()=>{
     semanticAnalyzer.analyze(parser.program() as ProgramSyntaxTree);
   })
 
-  it("should not allow to redefine a symbol", () => {
+  it("should allow to redefine a symbol on different scope", () => {
+    parser.setInput("real a; {bool a;}");
+    semanticAnalyzer.analyze(parser.program() as ProgramSyntaxTree);
+
+    parser.setInput("real a; {bool a; {real a;}}");
+    semanticAnalyzer.analyze(parser.program() as ProgramSyntaxTree);
+  })
+
+  it("should not allow to redefine a symbol on same scope", () => {
     parser.setInput("real a;\nbool a;");
     expect(()=>semanticAnalyzer.analyze(parser.program() as ProgramSyntaxTree)).toThrowError();
 
