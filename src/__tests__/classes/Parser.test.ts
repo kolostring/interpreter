@@ -130,6 +130,12 @@ describe("Parser", () => {
       int bcd = a;
     }`)
     expect(parser.program().postfix()).toBe(`{\nint (a)\na a 1 + =\nint (bcd a =)\n}`);
+
+    parser.setInput("{int a; {bool a;}}");
+    expect(parser.program().postfix()).toBe(`{\nint (a)\n{\nbool (a)\n}\n}`);
+
+    parser.setInput("{int a; {bool a;} {real b;}}");
+    expect(parser.program().postfix()).toBe(`{\nint (a)\n{\nbool (a)\n}\n{\nreal (b)\n}\n}`);
   })
 
   it("should parse function calls", () => {

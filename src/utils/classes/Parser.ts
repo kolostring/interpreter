@@ -229,7 +229,11 @@ export default class Parser {
         );
       }
 
-      root.addChild(this.sentence());
+      if(this.tokenizer.getCurrentToken().type === TokenKind.L_BRACE){
+        root.addChild(this.block());
+      }else{
+        root.addChild(this.sentence());
+      }
     }
 
     this.tokenizer.advance();
