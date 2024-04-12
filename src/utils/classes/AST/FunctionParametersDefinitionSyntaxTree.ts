@@ -15,7 +15,7 @@ export class FunctionParametersDefinitionSyntaxTree extends AbstractSyntaxTree {
       let pfx = "";
   
       this.children.forEach((node, index)=>{
-        pfx += (index > 0 ? ", " : " ") + (node?.postfix());
+        pfx += (index > 0 ? ", " : " ") + (node.postfix());
       })
   
       return "(" + pfx + ")";

@@ -29,21 +29,21 @@ export default class SemanticAnalyzer{
       return symbol.type;
     }
 
-    throw new Error(`Symbol "${ast.getChildren()[0]?.getToken().str}" is undefined`);
+    throw new Error(`Symbol "${ast.getChildren()[0].getToken().str}" is undefined`);
   }
 
   public validateEqualityOperationType(ast :AbstractSyntaxTree) :string{
     const leftChild = ast.getChildren()[0];
     const rightChild = ast.getChildren()[1];
     
-    if(this.getExpressionType(leftChild!) === this.getExpressionType(rightChild!)) return "bool";
+    if(this.getExpressionType(leftChild) === this.getExpressionType(rightChild)) return "bool";
 
     throw new Error(`Operator <${TokenKind[ast.getToken().type]}:"${ast.getToken().str}"> at row:${ast.getToken().row} col:${ast.getToken().col} cannot operate over different types`);
   }
 
   public validateOperation(ast: AbstractSyntaxTree, childrenTypes: string[], returnType: string) :string{
     const isValid = ast.getChildren().every((child)=>{
-      const expType = this.getExpressionType(child!);
+      const expType = this.getExpressionType(child);
       return childrenTypes.some((type) => type === expType);
     })
 
@@ -78,9 +78,9 @@ export default class SemanticAnalyzer{
   }
 
   private analyzeVariableAssigment(varAssign: BinaryOperatorSyntaxTree, type: string): void{
-    const expressionType = this.getExpressionType(varAssign.getChildren()[1]!);
+    const expressionType = this.getExpressionType(varAssign.getChildren()[1]);
     if(expressionType !== type){
-      const varToken = varAssign.getChildren()[0]!.getToken();
+      const varToken = varAssign.getChildren()[0].getToken();
       throw new Error(`Type missmatch on assignment of variable "${varToken.str}" at row: ${varToken.row} col: ${varToken.col}. Expected <${type}>, got <${expressionType}>`);
     }
   }
@@ -89,14 +89,14 @@ export default class SemanticAnalyzer{
     const type = varDeclST.getToken().str;
     varDeclST.getChildren()
     .forEach((child)=>{
-      let name = child!.getToken().str;
+      let name = child.getToken().str;
 
       if(child instanceof BinaryOperatorSyntaxTree){
-        name = child.getChildren()[0]!.getToken().str;
+        name = child.getChildren()[0].getToken().str;
         this.analyzeVariableAssigment(child, type);
       }
       
-      this.symbolTable.addSymbol(name, type, child!, this.currentScope);
+      this.symbolTable.addSymbol(name, type, child, this.currentScope);
     });
   }
 
@@ -107,8 +107,8 @@ export default class SemanticAnalyzer{
       if(child instanceof VariableDeclarationSyntaxTree){
         this.analyzeVariableDeclaration(child);
       }
-      else if(child!.getToken().type === TokenKind.ASSIGN){
-        const variable = child!.getChildren()[0]!;
+      else if(child.getToken().type === TokenKind.ASSIGN){
+        const variable = child.getChildren()[0];
         
         this.analyzeVariableAssigment(child as BinaryOperatorSyntaxTree, this.getSymbolType(variable));
       }

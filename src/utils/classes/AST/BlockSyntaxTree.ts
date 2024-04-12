@@ -14,7 +14,7 @@ export class BlockSyntaxTree extends AbstractSyntaxTree {
     let pfx = "";
 
     this.children.forEach((node)=>{
-      pfx += (node?.postfix()) + "\n";
+      pfx += (node.postfix()) + "\n";
     })
 
     return "{\n" + pfx + "}";

@@ -7,6 +7,6 @@ export class ReturnStatementSyntaxTree extends AbstractSyntaxTree {
   }
 
   public postfix(): string {
-    return this.token.str + " " + this.children[0]?.postfix();
+    return this.token.str + " " + this.children[0].postfix();
   }
 }

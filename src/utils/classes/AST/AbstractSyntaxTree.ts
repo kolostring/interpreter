@@ -2,9 +2,9 @@ import { Token } from "../Tokenizer";
 
 export abstract class AbstractSyntaxTree {
   protected token: Token;
-  protected children: (AbstractSyntaxTree | null)[];
+  protected children: (AbstractSyntaxTree)[];
 
-  constructor(token: Token, children: (AbstractSyntaxTree | null)[]) {
+  constructor(token: Token, children: (AbstractSyntaxTree)[]) {
     this.token = token;
     this.children = children;
   }

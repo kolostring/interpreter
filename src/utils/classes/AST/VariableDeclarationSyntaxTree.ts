@@ -16,7 +16,7 @@ export class VariableDeclarationSyntaxTree extends AbstractSyntaxTree {
     let pfx = "";
 
     this.children.forEach((node, index)=>{
-      pfx += (index > 0 ? "," : "") + " (" + (node?.postfix()) + ")";
+      pfx += (index > 0 ? "," : "") + " (" + (node.postfix()) + ")";
     })
 
     return this.token.str + pfx;

@@ -269,7 +269,6 @@ export default class Parser {
   }
 
   private functionCall() : AbstractSyntaxTree {
-    console.log("Enter Function Call");
     const root = new FunctionCallSyntaxTree(this.tokenizer.advance());
 
     this.eat(TokenKind.L_PARENTHESIS);

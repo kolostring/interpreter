@@ -10,7 +10,7 @@ export class FunctionDefinitionSyntaxTree extends AbstractSyntaxTree {
     }
     
     public postfix() {
-      return this.token.str + " " + this.children[0]?.postfix() + this.children[1]?.postfix() + this.children[2]?.postfix();
+      return this.token.str + " " + this.children[0].postfix() + this.children[1].postfix() + this.children[2].postfix();
     }
   }
   
