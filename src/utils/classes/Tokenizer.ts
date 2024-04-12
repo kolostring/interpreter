@@ -158,6 +158,7 @@ export default class Tokenizer {
     const currToken = this.currentToken;
     const currPtr = this.ptr;
     const currCol = this.col;
+    const currRow = this.row;
 
     while(--nToken >= 0){
       this.advance();
@@ -168,6 +169,7 @@ export default class Tokenizer {
     this.currentToken = currToken;
     this.ptr = currPtr;
     this.col = currCol;
+    this.row = currRow;
 
     return peekedToken;
   }
