@@ -4,7 +4,7 @@ import { TokenKind } from "../constants/tokenKinds";
 
 export type Token = {
   str: string;
-  type: TokenKind;
+  kind: TokenKind;
   pos: number
   row: number;
   col: number;
@@ -12,7 +12,7 @@ export type Token = {
 
 const bofToken = {
   str: "bof",
-  type: TokenKind.BOF,
+  kind: TokenKind.BOF,
   pos: -1,
   row: 0,
   col: -1,
@@ -84,7 +84,7 @@ export default class Tokenizer {
     if (this.ptr >= this.input.length) {
       this.currentToken = {
         str: "\0",
-        type: TokenKind.EOF,
+        kind: TokenKind.EOF,
         pos: this.ptr,
         row: this.row,
         col: this.col,
@@ -175,7 +175,7 @@ export default class Tokenizer {
   private updateCurrentToken(str: string, tokenID: number) {
     this.currentToken = {
       str: str,
-      type: tokenID,
+      kind: tokenID,
       pos: this.ptr - str.length,
       row: this.row,
       col: this.col - str.length,

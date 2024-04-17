@@ -55,13 +55,13 @@ describe("Tokenizer", () => {
   it("should return EOF if there's no token left", ()=>{
     tokenizer.setInput("1");
     tokenizer.advance();
-    expect(tokenizer.getNextToken().type).toBe(TokenKind.EOF);
+    expect(tokenizer.getNextToken().kind).toBe(TokenKind.EOF);
   })
   
   it("should return correct token type", ()=>{
     tokenizer.setInput("123 true false variable ={}()+-/*; && || != ==");
     [TokenKind.NUMBER, TokenKind.TRUE, TokenKind.FALSE, TokenKind.SYMBOL, TokenKind.ASSIGN, TokenKind.L_BRACE, TokenKind.R_BRACE, TokenKind.L_PARENTHESIS, TokenKind.R_PARENTHESIS, TokenKind.PLUS, TokenKind.MINUS, TokenKind.DIV, TokenKind.MUL, TokenKind.SEMI, TokenKind.AND, TokenKind.OR, TokenKind.DIFFERENT, TokenKind.EQUAL].forEach((token)=>{
-      expect(TokenKind[tokenizer.getNextToken().type]).toBe(TokenKind[token]);
+      expect(TokenKind[tokenizer.getNextToken().kind]).toBe(TokenKind[token]);
     })
   })
 
