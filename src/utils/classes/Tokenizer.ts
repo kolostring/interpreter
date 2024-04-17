@@ -1,3 +1,4 @@
+import { keywords } from "../constants/keywords";
 import { operators } from "../constants/operators";
 import { TokenKind } from "../constants/tokenKinds";
 
@@ -147,14 +148,8 @@ export default class Tokenizer {
   private tokenizeSymbol(): void {
     const str = this.stripWord();
 
-    if(str === "true"){
-      this.updateCurrentToken(str, TokenKind.TRUE)
-    }
-    else if(str === "false"){
-      this.updateCurrentToken(str, TokenKind.FALSE)
-    }
-    else if(str === "return"){
-      this.updateCurrentToken(str, TokenKind.RETURN)
+    if(str in keywords){
+      this.updateCurrentToken(str, keywords[str])
     }
     else{
       this.updateCurrentToken(str, TokenKind.SYMBOL);

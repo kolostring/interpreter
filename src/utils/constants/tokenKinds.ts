@@ -29,6 +29,9 @@ export enum TokenKind {
   FALSE,
   NUMBER,
   RETURN,
+  IF,
+  ELSE,
+  ELIF
 }
 
 export function isTokenLiteral(tokenKind: TokenKind){
