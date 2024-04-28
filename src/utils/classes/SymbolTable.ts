@@ -1,10 +1,11 @@
-import { AbstractSyntaxTree } from "./AST/AbstractSyntaxTree";
+import { SyntaxTree } from "./SyntaxTree";
+
 
 export type SymbolType = {
   scope: number;
   name: string;
   type: string;
-  ast: AbstractSyntaxTree;
+  ast: SyntaxTree;
 };
 
 export default class SymbolTable {
@@ -14,7 +15,7 @@ export default class SymbolTable {
     return this.symbols.find((symb) => symb.name === symbolName);
   }
 
-  public addSymbol(name: string, type: string, ast: AbstractSyntaxTree, scope: number){
+  public addSymbol(name: string, type: string, ast: SyntaxTree, scope: number){
     const foundSymbol = this.findSymbolByName(name);
       if(foundSymbol === undefined || foundSymbol.scope !== scope){
         this.symbols.unshift({name:name, scope: scope, type: type, ast: ast});
