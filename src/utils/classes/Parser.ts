@@ -167,7 +167,7 @@ export default class Parser {
   private variableAssignment(): SyntaxTree {
     let root = new SyntaxTree(SyntaxTreeKind.VARIABLE, this.tokenizer.advance(), []);
     
-    root = new SyntaxTree(SyntaxTreeKind.BINARY_OPERATOR, this.tokenizer.advance(), [root, this.expression()])
+    root = new SyntaxTree(SyntaxTreeKind.ASSIGNMENT, this.tokenizer.advance(), [root, this.expression()])
 
     return root;
   }

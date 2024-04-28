@@ -97,7 +97,7 @@ describe("Parser", () => {
 
   it("should parse Variable assignment", ()=>{
     parser.setInput("a = 123 + 4;");
-    expect(postfix(parser.program())).toBe("a 123 4 + =");
+    expect(postfix(parser.program())).toBe("a = 123 4 +");
   })
 
   it("should parse Variable declaration", ()=>{
@@ -106,12 +106,12 @@ describe("Parser", () => {
     parser.setInput("int a, b, c;")
     expect(postfix(parser.program())).toBe("int (a), (b), (c)");
     parser.setInput("int a = 12;")
-    expect(postfix(parser.program())).toBe("int (a 12 =)");
+    expect(postfix(parser.program())).toBe("int (a = 12)");
     parser.setInput("int a = 12 * 3 + 4;")
-    expect(postfix(parser.program())).toBe("int (a 12 3 * 4 + =)");
+    expect(postfix(parser.program())).toBe("int (a = 12 3 * 4 +)");
 
     parser.setInput("int a = 12*3+4, b, c = 56 * (7 + 8);")
-    expect(postfix(parser.program())).toBe("int (a 12 3 * 4 + =), (b), (c 56 7 8 + * =)");
+    expect(postfix(parser.program())).toBe("int (a = 12 3 * 4 +), (b), (c = 56 7 8 + *)");
   })
 
   it("should parse several sentences", () => {
@@ -119,7 +119,7 @@ describe("Parser", () => {
     expect(postfix(parser.program())).toBe("a b + c +\nd f + g +\nh j + k +");
 
     parser.setInput("int a = 12;\nint b = 34 + 5;6*7;");
-    expect(postfix(parser.program())).toBe("int (a 12 =)\nint (b 34 5 + =)\n6 7 *");
+    expect(postfix(parser.program())).toBe("int (a = 12)\nint (b = 34 5 +)\n6 7 *");
   })
 
   it("should parse blocks", () => {
@@ -130,7 +130,7 @@ describe("Parser", () => {
       a = a + 1;
       int bcd = a;
     }`)
-    expect(postfix(parser.program())).toBe(`{\nint (a)\na a 1 + =\nint (bcd a =)\n}`);
+    expect(postfix(parser.program())).toBe(`{\nint (a)\na = a 1 +\nint (bcd = a)\n}`);
 
     parser.setInput("{int a; {bool a;}}");
     expect(postfix(parser.program())).toBe(`{\nint (a)\n{\nbool (a)\n}\n}`);
@@ -159,7 +159,7 @@ describe("Parser", () => {
       a = a + 1;
       int bcd = a;
     }`);
-    expect(postfix(parser.program())).toBe("void foo(){\nint (a)\na a 1 + =\nint (bcd a =)\n}");
+    expect(postfix(parser.program())).toBe("void foo(){\nint (a)\na = a 1 +\nint (bcd = a)\n}");
 
     parser.setInput(`int foo(int a, int b, int c){
       return a + b + c;
@@ -190,7 +190,6 @@ describe("Parser", () => {
     parser.setInput(";");
     expect(()=>{parser.program()}).toThrowError();
     parser.setInput("();");
-    it("should not allow to elif or else statement without an if")
     expect(()=>{parser.program()}).toThrowError();
   });
 

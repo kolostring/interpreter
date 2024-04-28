@@ -37,6 +37,9 @@ const postfixFunctions : Record<SyntaxTreeKind, (syntaxTree: SyntaxTree) => stri
   [SyntaxTreeKind.VARIABLE]: (syntaxTree) =>{
     return syntaxTree.getToken().str;
   },
+  [SyntaxTreeKind.ASSIGNMENT]: (syntaxTree) =>{
+    return `${postfix(syntaxTree.getChildren()[0])} ${syntaxTree.getToken().str} ${postfix(syntaxTree.getChildren()[1])}`;
+  },
   [SyntaxTreeKind.BINARY_OPERATOR]: (syntaxTree) =>{
     return `${postfix(syntaxTree.getChildren()[0])} ${postfix(syntaxTree.getChildren()[1])} ${syntaxTree.getToken().str}`;
   },
