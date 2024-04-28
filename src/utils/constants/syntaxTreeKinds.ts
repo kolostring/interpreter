@@ -1,5 +1,7 @@
 export enum SyntaxTreeKind{
   PROGRAM,
+  IF,
+  ELSE,
   FUNCTION_DEFINITION,
   FUNCTION_PARAMETERS_DEFINITION,
   BLOCK,

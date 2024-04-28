@@ -30,7 +30,10 @@ export default class Parser {
   
     while(this.tokenizer.getCurrentToken().kind !== TokenKind.EOF)
     {
-      if(this.tokenizer.getCurrentToken().kind === TokenKind.L_BRACE){
+      if(this.tokenizer.getCurrentToken().kind === TokenKind.IF){
+        children.push(this.conditionalCompound());
+      }
+      else if(this.tokenizer.getCurrentToken().kind === TokenKind.L_BRACE){
         children.push(this.block());
       }
       else if(
@@ -46,6 +49,23 @@ export default class Parser {
     }
   
     return new SyntaxTree(SyntaxTreeKind.PROGRAM, token, children);
+  }
+
+  private conditionalCompound(): SyntaxTree{
+    const token = this.tokenizer.advance();
+    this.eat(TokenKind.L_PARENTHESIS);
+    const expression = this.expression();
+    this.eat(TokenKind.R_PARENTHESIS);
+
+    const block = this.block();
+    let dependent: SyntaxTree[]= [];
+    if(this.tokenizer.getCurrentToken().kind === TokenKind.ELIF){
+      dependent = [this.conditionalCompound()];
+    }else if (this.tokenizer.getCurrentToken().kind === TokenKind.ELSE){
+      dependent = [new SyntaxTree(SyntaxTreeKind.ELSE, this.tokenizer.advance(), [this.block()])];
+    }
+
+    return new SyntaxTree(SyntaxTreeKind.IF, token, [expression, block].concat(dependent));
   }
 
   private functionDefinition(): SyntaxTree{
@@ -91,7 +111,10 @@ export default class Parser {
         );
       }
 
-      if(this.tokenizer.getCurrentToken().kind === TokenKind.L_BRACE){
+      if(this.tokenizer.getCurrentToken().kind === TokenKind.IF){
+        children.push(this.conditionalCompound());
+      }
+      else if(this.tokenizer.getCurrentToken().kind === TokenKind.L_BRACE){
         children.push(this.block());
       }else{
         children.push(this.sentence());

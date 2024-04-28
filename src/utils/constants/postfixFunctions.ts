@@ -7,6 +7,12 @@ const postfixFunctions : Record<SyntaxTreeKind, (syntaxTree: SyntaxTree) => stri
       return acc + (index > 0? "\n" : "") + (postfix(child));
     }, "");
   },
+  [SyntaxTreeKind.IF]: (syntaxTree) =>{
+    return syntaxTree.getToken().str + "(" + postfix(syntaxTree.getChildren()[0]) + ")" + postfix(syntaxTree.getChildren()[1]) + (syntaxTree.getChildren()[2] === undefined ? "" : postfix(syntaxTree.getChildren()[2]));
+  },
+  [SyntaxTreeKind.ELSE]: (syntaxTree) =>{
+    return syntaxTree.getToken().str + postfix(syntaxTree.getChildren()[0]);
+  },
   [SyntaxTreeKind.FUNCTION_DEFINITION]: (syntaxTree) =>{
     return syntaxTree.getToken().str + " " + postfix(syntaxTree.getChildren()[0]) + postfix(syntaxTree.getChildren()[1]) + postfix(syntaxTree.getChildren()[2]);
   },

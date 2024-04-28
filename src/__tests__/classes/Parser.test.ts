@@ -168,6 +168,17 @@ describe("Parser", () => {
     expect(postfix(parser.program())).toBe(`int foo( int (a), int (b), int (c)){\nreturn a b + c +\n}`);
   })
 
+  it("should parse conditional compounds", () => {
+    parser.setInput("if(a>b){\nreal c;}");
+    expect(postfix(parser.program())).toBe("if(a b >){\nreal (c)\n}");
+
+    parser.setInput("if(a>b){\nreal c;}\nelse{real d;}");
+    expect(postfix(parser.program())).toBe("if(a b >){\nreal (c)\n}else{\nreal (d)\n}");
+
+    parser.setInput("if(a>b){\nreal c;}\nelif(a==b){\nreal d;}\nelse{\nreal e;}");
+    expect(postfix(parser.program())).toBe("if(a b >){\nreal (c)\n}elif(a b ==){\nreal (d)\n}else{\nreal (e)\n}");
+  })
+
   it("should not allow to have missing operands", () => {
     parser.setInput("1-;");
     expect(()=>{parser.program()}).toThrowError();
@@ -179,6 +190,7 @@ describe("Parser", () => {
     parser.setInput(";");
     expect(()=>{parser.program()}).toThrowError();
     parser.setInput("();");
+    it("should not allow to elif or else statement without an if")
     expect(()=>{parser.program()}).toThrowError();
   });
 
