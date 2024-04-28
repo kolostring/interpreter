@@ -35,47 +35,48 @@ export default class Parser {
   }
   
   public program(): AbstractSyntaxTree {
-    const root = new ProgramSyntaxTree(this.tokenizer.advance());
+    const token = this.tokenizer.advance();
+    const children: AbstractSyntaxTree[] = [];
   
     while(this.tokenizer.getCurrentToken().kind !== TokenKind.EOF)
     {
       if(this.tokenizer.getCurrentToken().kind === TokenKind.L_BRACE){
-        root.addChild(this.block());
+        children.push(this.block());
       }
       else if(
         this.tokenizer.peekToken(0).kind === TokenKind.SYMBOL &&
         this.tokenizer.peekToken(1).kind === TokenKind.SYMBOL &&
         this.tokenizer.peekToken(2).kind === TokenKind.L_PARENTHESIS
       ){
-        root.addChild(this.functionDefinition());
+        children.push(this.functionDefinition());
       }
       else {
-        root.addChild(this.sentence());
+        children.push(this.sentence());
       }
     }
   
-    return root;
+    return new ProgramSyntaxTree(token, children);
   }
 
   private functionDefinition(): AbstractSyntaxTree{
     const retType = this.tokenizer.advance();
     const identifier = new VariableSyntaxTree(this.tokenizer.advance());
 
-    return new FunctionDefinitionSyntaxTree(retType, identifier, this.functionDefinitionParameters(), this.block());
+    return new FunctionDefinitionSyntaxTree(retType, identifier, this.functionParametersDefinition(), this.block());
   }
 
-  private functionDefinitionParameters(): FunctionParametersDefinitionSyntaxTree{
-    const root = new FunctionParametersDefinitionSyntaxTree(this.tokenizer.getCurrentToken());
+  private functionParametersDefinition(): FunctionParametersDefinitionSyntaxTree{
+    const token = this.tokenizer.getCurrentToken();
+    const children: AbstractSyntaxTree[] = [];
 
     this.eat(TokenKind.L_PARENTHESIS);
 
     let parametersLeft :boolean = this.tokenizer.getCurrentToken().kind !== TokenKind.R_PARENTHESIS;
 
     while(parametersLeft){
-      const parameter = new VariableDeclarationSyntaxTree(this.tokenizer.advance());
-      parameter.addChild(new VariableSyntaxTree(this.tokenizer.advance()));
+      const parameter = new VariableDeclarationSyntaxTree(this.tokenizer.advance(), [new VariableSyntaxTree(this.tokenizer.advance())]);
       
-      root.addChild(parameter);
+      children.push(parameter);
       if(this.tokenizer.getCurrentToken().kind === TokenKind.COMMA){
         parametersLeft = true;
         this.tokenizer.advance();
@@ -86,11 +87,12 @@ export default class Parser {
 
     this.eat(TokenKind.R_PARENTHESIS);
 
-    return root;
+    return new FunctionParametersDefinitionSyntaxTree(token, children);
   }
   
   private block(): BlockSyntaxTree {
-    const root = new BlockSyntaxTree(this.tokenizer.advance());
+    const token = this.tokenizer.advance();
+    const children: AbstractSyntaxTree[] = []; 
 
     while(this.tokenizer.getCurrentToken().kind !== TokenKind.R_BRACE){
       if (this.tokenizer.getCurrentToken().kind === TokenKind.EOF){
@@ -100,14 +102,14 @@ export default class Parser {
       }
 
       if(this.tokenizer.getCurrentToken().kind === TokenKind.L_BRACE){
-        root.addChild(this.block());
+        children.push(this.block());
       }else{
-        root.addChild(this.sentence());
+        children.push(this.sentence());
       }
     }
 
     this.tokenizer.advance();
-    return root;
+    return new BlockSyntaxTree(token, children);
   }
 
   private sentence(): AbstractSyntaxTree {
@@ -133,19 +135,20 @@ export default class Parser {
   }
 
   private variableDeclaration() : AbstractSyntaxTree {
-    const root = new VariableDeclarationSyntaxTree(this.tokenizer.getCurrentToken());
+    const token = this.tokenizer.getCurrentToken();
+    const children: AbstractSyntaxTree[] = [];
     
     do{
       this.tokenizer.advance();
 
       if(this.tokenizer.peekToken(1).kind === TokenKind.ASSIGN){
-        root.addChild(this.variableAssignment());
+        children.push(this.variableAssignment());
       }else{
-        root.addChild(new VariableSyntaxTree(this.tokenizer.advance()))
+        children.push(new VariableSyntaxTree(this.tokenizer.advance()))
       }
     }while(this.tokenizer.getCurrentToken().kind === TokenKind.COMMA)
 
-    return root;
+    return new VariableDeclarationSyntaxTree(token, children);
   }
 
   private variableAssignment(): AbstractSyntaxTree {
@@ -296,14 +299,15 @@ export default class Parser {
   }
 
   private functionCall() : AbstractSyntaxTree {
-    const root = new FunctionCallSyntaxTree(this.tokenizer.advance());
+    const token = this.tokenizer.advance();
+    const children: AbstractSyntaxTree[] = [];
 
     this.eat(TokenKind.L_PARENTHESIS);
 
     let parametersLeft :boolean = this.tokenizer.getCurrentToken().kind !== TokenKind.R_PARENTHESIS;
 
     while(parametersLeft){
-      root.addChild(this.expression());
+      children.push(this.expression());
 
       if(this.tokenizer.getCurrentToken().kind === TokenKind.COMMA){
         parametersLeft = true;
@@ -315,6 +319,6 @@ export default class Parser {
 
     this.eat(TokenKind.R_PARENTHESIS);
 
-    return root;
+    return new FunctionCallSyntaxTree(token, children);
   }
 }
