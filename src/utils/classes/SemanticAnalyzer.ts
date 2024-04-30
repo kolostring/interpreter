@@ -27,7 +27,27 @@ export default class SemanticAnalyzer{
       else if(child.getKind() === SyntaxTreeKind.BLOCK){
         this.analyzeBlock(child);
       }
+      else if(child.getKind() === SyntaxTreeKind.IF){
+        this.analyzeConditionalCompound(child);
+      }
     })
+  }
+
+  private analyzeConditionalCompound(conditionalST: SyntaxTree){
+    const expression = conditionalST.getChildren()[0];
+    const block = conditionalST.getChildren()[1];
+    const dependent = conditionalST.getChildren()[2];
+
+    this.checkExpressionType(expression, ["bool"]);
+    this.analyzeBlock(block);
+
+    if(dependent === undefined) return;
+
+    if(dependent.getKind() === SyntaxTreeKind.IF){
+      this.analyzeConditionalCompound(dependent)
+    }else{
+      this.analyzeBlock(dependent.getChildren()[0]);
+    }
   }
 
   private analyzeBlock(blockST: SyntaxTree): void {

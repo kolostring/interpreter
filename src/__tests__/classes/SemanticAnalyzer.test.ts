@@ -19,6 +19,14 @@ describe("Semantic Analyzer", ()=>{
     semanticAnalyzer.analyze(parser.program());
   });
 
+  it("should allow conditional compounds", ()=>{
+    parser.setInput("if(true){\nreal a;\n}else{real b;}");
+    semanticAnalyzer.analyze(parser.program());
+
+    parser.setInput("if(12 > 3){\nreal a;\n}elif(12==3){\nreal b;}else{\nreal c;}");
+    semanticAnalyzer.analyze(parser.program());
+  })
+
   it("should not allow arithmetic operators to operate over any type other than real", ()=>{
     parser.setInput("123+true;");
     expect(()=>semanticAnalyzer.analyze(parser.program())).toThrowError();
@@ -76,6 +84,13 @@ describe("Semantic Analyzer", ()=>{
 
   it("should not allow to assign to undefined variables", () => {
     parser.setInput("a = true;");
+    expect(()=>semanticAnalyzer.analyze(parser.program())).toThrowError();
+  })
+
+  it("should not allow non boolean expressions as conditions", ()=> {
+    parser.setInput("if(123 + 2){\nreal a;\n}");
+    expect(()=>semanticAnalyzer.analyze(parser.program())).toThrowError();
+    parser.setInput("real a;if(a > 3){\nreal b;\n}elif(a + 4){\nreal b;}");
     expect(()=>semanticAnalyzer.analyze(parser.program())).toThrowError();
   })
 })
