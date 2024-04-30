@@ -1,0 +1,1 @@
+export const builtInTypes :string[] = ["int", "real", "bool"];

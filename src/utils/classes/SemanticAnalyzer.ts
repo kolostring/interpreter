@@ -1,3 +1,4 @@
+import { builtInTypes } from "../constants/builtinTypes";
 import { SyntaxTreeKind } from "../constants/syntaxTreeKinds";
 import { TokenKind, isTokenArithmeticOperator, isTokenEqualityOperator, isTokenLiteral, isTokenLogicalOperator, isTokenRelationalOperator } from "../constants/tokenKinds";
 import SymbolTable from "./SymbolTable";
@@ -59,6 +60,12 @@ export default class SemanticAnalyzer{
 
   private analyzeVariableDefinition (varDeclST: SyntaxTree): void {
     const type = varDeclST.getToken().str;
+
+    if(builtInTypes.indexOf(type) === -1){
+      const token = varDeclST.getToken();
+      throw new Error(`Undefined type "${type}" on row: ${token.row} col: ${token.col}`);
+    }
+
     varDeclST.getChildren()
     .forEach((definition)=>{
       let symbolName = definition.getToken().str;

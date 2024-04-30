@@ -66,6 +66,11 @@ describe("Semantic Analyzer", ()=>{
     semanticAnalyzer.analyze(parser.program());
   })
 
+  it("should not allow to define symbols with undefined types", () => {
+    parser.setInput("integer a;");
+    expect(()=>semanticAnalyzer.analyze(parser.program())).toThrowError();
+  })
+
   it("should not allow to redefine a symbol on same scope", () => {
     parser.setInput("real a;\nbool a;");
     expect(()=>semanticAnalyzer.analyze(parser.program())).toThrowError();
